@@ -54,11 +54,23 @@ function makeExpressApp ( app ) {
 
         // ### Errors
         app.expressApp.use( ( err, req, res, next ) => res.status( 500 ).send( '<pre>' + err  + '<pre>' ) );
-
+        
         // Routes
         // ------
         // ### Home
         app.expressApp.get( '/', ( req, res ) => res.render( 'homepage', makeJadeData( app ) ) );
+
+        // ### Punters
+        app.expressApp.get( '/punter/:cid', function ( req, res ) {
+            var jadeData = makeJadeData( app );
+            jadeData.cid = req.params.cid;
+            res.render( 'punter', jadeData );
+        });
+
+        // ### Hosts
+        app.expressApp.get( '/host/', function ( req, res ) {
+            res.render( 'host', makeJadeData( app ) );
+        });
 
         // ### W.js Clientside
         app.expressApp.get( '/W.min.js', W.jsMinMiddleware() );
