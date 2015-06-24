@@ -1,7 +1,7 @@
 {
-  "name": "mirror-box",
+  "name": "mirror-tunnel",
   "version": "0.1.0",
-  "description": "HTC Mirror Box application for an installation at the following festivals: Love Box, Wilderness",
+  "description": "HTC Mirror Tunnel application for an installation at the following festivals: Love Box, Wilderness",
   "main": "app.htc-server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
