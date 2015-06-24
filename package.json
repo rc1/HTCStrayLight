@@ -1,0 +1,38 @@
+{
+  "name": "mirror-box",
+  "version": "0.1.0",
+  "description": "HTC Mirror Box application for an installation at the following festivals: Love Box, Wilderness",
+  "main": "app.server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theworkers/HTC-Mirror-Tunnel"
+  },
+  "author": "rc1",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theworkers/HTC-Mirror-Tunnel/issues"
+  },
+  "homepage": "https://github.com/theworkers/HTC-Mirror-Tunnel",
+  "dependencies": {
+    "express": "^4.13.0",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^2.3.1",
+    "gulp-babel": "^5.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-less": "^3.0.3",
+    "gulp-livereload": "^3.8.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.6",
+    "jade": "^1.11.0",
+    "less": "^2.5.1",
+    "markdown": "^0.5.0",
+    "orchestrator": "^0.3.7",
+    "serve-static": "^1.10.0",
+    "w-js": "^4.42.1"
+  }
+}

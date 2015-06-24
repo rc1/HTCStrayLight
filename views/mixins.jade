@@ -1,0 +1,56 @@
+//- Head
+//- ====
+mixin head-meta ()
+    meta( http-equiv="X-UA-Compatible", content="IE=9; IE=8; IE=7; IE=EDGE" )
+    meta( charset="utf-8", content="IE=edge" )
+    meta( name='viewport', content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0' )
+
+mixin head-css ()
+    link( rel='stylesheet', type='text/css', href='/css/all.css' )
+
+mixin core-scripts ()
+    script( src='/js/libs.js' )
+    script( src='/W.min.js' )
+    script( src='/js/all.js' )
+    if isLocal
+        script.
+            document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
+
+//- Typeography
+//- ===========
+mixin experiment-typography ()
+    h1 Heading 1 - The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+    h2 Heading 2 - The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+    h4 Heading 4 - The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+    h3 Heading 3 - The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+    h4 Heading 4 - The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+    h5 Heading 5 - The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+    h6 Heading 6 - The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+
+    p Photo booth lo-fi 
+        a( href='http://google.com/' ) street art.         
+        | Marfa biodiesel mumblecore four loko 
+        a( href='http://google.com/' ) letterpress Cosby
+        |  sweater. Tofu pour-over wolf, polaroid before they sold out pop-up freegan selvage Portland Thundercats aesthetic Pinterest wayfarers craft beer. Photo booth sartorial distillery, mustache cornhole Schlitz asymmetrical readymade forage retro occupy. Hoodie cred retro, umami swag letterpress Carles try-hard tofu four loko. Bespoke pickled PBR&B, squid wayfarers selvage try-hard. Craft beer organic drinking vinegar, four loko meggings ethnic tofu.
+
+    p IPhone fashion axe DIY farm-to-table readymade. American Apparel chambray try-hard, squid banh mi fap direct trade letterpress Echo Park gastropub polaroid. Bushwick Williamsburg gluten-free four loko Kickstarter Etsy roof party selvage plaid cred flexitarian, messenger bag retro wayfarers. Intelligentsia cred fap, occupy photo booth Banksy XOXO. Quinoa fap photo booth raw denim PBR lo-fi, Tonx gentrify pickled skateboard. Marfa Banksy kale chips Echo Park chillwave, aesthetic flannel actually distillery artisan master cleanse bitters. Post-ironic skateboard drinking vinegar distillery.
+
+    ul
+        li The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+        li The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+        li The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+
+    p Photo booth lo-fi YOLO 
+        a( href='http://google.com/' ) street art.
+        |  Marfa biodiesel mumblecore four loko 
+        a( href='http://google.com/' ) letterpress Cosby
+        |  sweater. Tofu pour-over wolf, polaroid before they sold out pop-up freegan selvage Portland Thundercats aesthetic Pinterest wayfarers craft beer. Photo booth sartorial distillery, mustache cornhole Schlitz asymmetrical readymade forage retro occupy. Hoodie cred retro, umami swag letterpress Carles try-hard tofu four loko. Bespoke pickled PBR&B, squid wayfarers selvage try-hard. Craft beer organic drinking vinegar, four loko meggings ethnic tofu.
+
+    p IPhone fashion axe DIY farm-to-table readymade. American Apparel chambray try-hard, squid banh mi fap direct trade letterpress Echo Park gastropub polaroid. Bushwick Williamsburg gluten-free four loko Kickstarter Etsy roof party selvage plaid cred flexitarian, messenger bag retro wayfarers. Intelligentsia cred fap, occupy photo booth Banksy XOXO. Quinoa fap photo booth raw denim PBR lo-fi, Tonx gentrify pickled skateboard. Marfa Banksy kale chips Echo Park chillwave, aesthetic flannel actually distillery artisan master cleanse bitters. Post-ironic skateboard drinking vinegar distillery.
+
+    ol
+        li The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+        li The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+        li The quick brown fox jumps over the lazy dog THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+
+    p IPhone fashion axe DIY farm-to-table readymade. American Apparel chambray try-hard, squid banh mi fap direct trade letterpress Echo Park gastropub polaroid. Bushwick Williamsburg gluten-free four loko Kickstarter Etsy roof party selvage plaid cred flexitarian, messenger bag retro wayfarers. Intelligentsia cred fap, occupy photo booth Banksy XOXO. Quinoa fap photo booth raw denim PBR lo-fi, Tonx gentrify pickled skateboard. Marfa Banksy kale chips Echo Park chillwave, aesthetic flannel actually distillery artisan master cleanse bitters. Post-ironic skateboard drinking vinegar distillery.

@@ -1,0 +1,28 @@
+// Globals
+// =======
+
+// Color
+// -----
+@white: #FFFFFF;
+@black: #020202;
+
+// Levels
+// ------
+// @some-level: 10;
+
+// Media Queries
+// -------------
+@fat-screen: ~"all and (min-width: 1201px)";
+@wide-screen: ~"all and (min-width: 841px) and (max-width: 1200px)";
+@thin-screen: ~"all and (min-width: 531px) and (max-width: 840px)";
+@skinny-screen: ~"all and (max-width: 530px)";
+
+// Fixes
+// =====
+svg:not(:root) { overflow: hidden; }
+
+// Combine Stylesheets
+// ===================
+@import (inline) "reset.less";
+@import "layout.less";
+@import "typography.less";

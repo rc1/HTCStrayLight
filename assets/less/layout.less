@@ -1,0 +1,26 @@
+// Layout
+// ======
+
+html, body { margin: 0; padding: 0; height: 100% }
+img { display: block; }
+* { box-sizing: border-box }
+
+// Utils
+// =====
+.fixed { position: fixed; }
+.hidden { display: none; }
+.pointer { cursor: pointer; }
+
+// Responsiveness
+// --------------
+.show-on { display: none; }
+// ### Block
+.fat-block { @media @fat-screen { display: block; } }
+.wide-block { @media @wide-screen { display: block; } }
+.thin-block { @media @thin-screen { display: block; } }
+.skinny-block { @media @skinny-screen { display: block; } }
+// ### Inline
+.fat-inline { @media @fat-screen { display: inline; } }
+.wide-inline { @media @wide-screen { display: inline; } }
+.thin-inline { @media @thin-screen { display: inline; } }
+.skinny-inline { @media @skinny-screen { display: inline; } }
