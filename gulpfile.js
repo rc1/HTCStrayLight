@@ -16,7 +16,7 @@ var babel = require( 'gulp-babel' );
 // Basic
 // =====
 
-gulp.task( 'default', [ 'less', 'js', 'js-libs' ] );
+gulp.task( 'default', [ 'less', 'js', 'js-libs', 'copy' ] );
 
 gulp.task( 'watch', function () {
 
@@ -35,6 +35,7 @@ gulp.task( 'watch', function () {
     gulp.watch( './assets/js/**/*.js', [ 'js' ] );
     gulp.watch( './assets/js-libs/**/*.js', [ 'js' ] );
     gulp.watch( './**/*.jade', [ 'jade' ] );
+    gulp.watch( './assets/copy/**/*', [ 'copy' ] );
 });
 
 // Tasks
@@ -76,4 +77,9 @@ gulp.task( 'js-libs', function () {
         .pipe( uglify() )
         .pipe( gulp.dest( './public/js' ) )
         .pipe( livereload() );
+});
+
+gulp.task( 'copy', function () {
+    gulp.src( [ './assets/copy/**/*' ] )
+        .pipe(gulp.dest( './public/' ));
 });

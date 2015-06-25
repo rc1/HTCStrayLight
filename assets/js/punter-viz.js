@@ -24,6 +24,8 @@ var PunterViz = (function () {
                                       makeWebCamTexture,
                                       makeCubeCam,
                                       makeWebCamBoxMesh,
+                                      makeSwarm,
+                                      makeLights,
                                       makeRenderLoop );
 
     // Promisers
@@ -66,8 +68,6 @@ var PunterViz = (function () {
             // Web Cam DOM Element
             // -------------------
             var webCamEl = document.createElement('video');
-            webCamEl.width = 200;
-            webCamEl.height = 200;
             webCamEl.autoplay = true;
 
             // Web Cam Stream
@@ -147,6 +147,118 @@ var PunterViz = (function () {
             
 	    app.scene.add( app.webCamvBoxMesh );
 
+            // Show it only for the cube cam
+            app.preCubeCamRenderFns.push( function () {
+                app.webCamvBoxMesh.visible = true;
+            });
+
+            app.postCubeCamRenderFns.push( function () {
+                app.webCamvBoxMesh.visible = false;
+            });
+
+            
+
+            resolve( app );
+        });
+    }
+
+    // Lights
+    // ------
+    function makeLights ( app ) {
+        return W.promise( function ( resolve, reject ) {
+            app.scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+            var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+	    directionalLight.position.set( 2, 1.2, 10 ).normalize();
+	    app.scene.add( directionalLight );
+
+	    directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+	    directionalLight.position.set( -2, 1.2, -10 ).normalize();
+	    app.scene.add( directionalLight );  
+            resolve( app );
+        });
+    }
+
+    // Swarm
+    // -----
+    function makeSwarm ( app ) {
+        return W.promise( function ( resolve, reject ) {
+            
+            var particles = [];
+
+            // Loader
+            // ------
+            var loader = new THREE.OBJLoader();
+            loader.load( '/obj/pillow-box.obj', onObjLoaded );
+
+            // Swarm Creation
+            // ----------------
+            function onObjLoaded ( obj ) {
+
+                var mesh = obj.children[ 0 ];
+
+                // Particle Creation
+                // -----------------
+                // Ease in the creation of the particles
+                var maxParticles = 100;
+                var minCreationTime = 5;
+                var maxCreationTimeMS = 100;
+
+                var material = 
+                (function createMore () {
+                    if ( particles.length < maxParticles ) {
+                        particles.push( new Particle( mesh ) );
+                        setTimeout( createMore, W.map( particles.length / maxParticles, 0, 1, maxCreationTimeMS, minCreationTime, W.interpolations.easeIn ) );
+                    }
+                }());
+                
+            }
+
+            // Updating
+            addPreRenderFn( app, function ( deltaMS, timestampMS ) {
+                particles.forEach( particle => particle.update( deltaMS, timestampMS ) );
+            });
+
+            // Particle Class
+            // --------------
+            function Particle ( mesh ) {
+
+                this.velocity = W.randomBetween( 0.2, 1 );
+
+                // Mesh
+                this.mesh = mesh.clone();
+                this.mesh.material = Particle.material.clone();
+                this.mesh.scale.x = Particle.initialScale;
+                this.mesh.scale.y = Particle.initialScale;
+                this.mesh.scale.z = Particle.initialScale;
+                var range = 100;
+                this.mesh.position.set( ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range );
+                                
+                // Position
+                this.anchor = new THREE.Object3D();
+                this.anchor.add( this.mesh );
+                app.scene.add( this.anchor );
+            }
+
+            // ### Static
+            Particle.material = new THREE.MeshPhongMaterial( {
+		color: 0xffffff,
+		shininess: 0.0,
+		specular: 0xffffff,
+		envMap: app.cubeCamera.renderTarget,
+                reflectivity: 1.0,
+                side: THREE.DoubleSide
+            });
+
+            Particle.initialScale = 40;
+
+            // ### Method
+            Particle.prototype.update = function ( deltaMS, timestampMS ) {
+                this.anchor.rotation.x += 0.002;
+                this.anchor.rotation.y += this.velocity / 10;
+                this.anchor.rotation.z += 0.001;
+            };
+            
             resolve( app );
         });
     }
@@ -198,9 +310,9 @@ var PunterViz = (function () {
     // Camera
     // ------
     function setCameraPosition ( app, x, y, z ) {
-        app.camera.x = x;
-        app.camera.y = y;
-        app.camera.z = y;
+        app.camera.position.x = x;
+        app.camera.position.y = y;
+        app.camera.position.z = z;
     }
  
     // Export
