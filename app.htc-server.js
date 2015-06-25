@@ -5,7 +5,7 @@
 
 // Modules
 // =======
-var http = require( 'http' );
+var https = require( 'https' );
 var fs = require( 'fs' );
 var path = require( 'path' );
 var express = require( 'express' );
@@ -57,6 +57,16 @@ function makeExpressApp ( app ) {
         
         // Routes
         // ------
+        // ### Manifest
+        app.expressApp.get( '/manifest.json', function ( req, res ) {
+            res.json({
+                "name": "HTC Punter",
+                "start_url": "/punter/1",
+                "display": "standalone",
+                "orientation": "portrait"
+            });
+        });
+        
         // ### Home
         app.expressApp.get( '/', ( req, res ) => res.render( 'homepage', makeJadeData( app ) ) );
 
@@ -81,7 +91,12 @@ function makeExpressApp ( app ) {
 
 function makeServer ( app ) {
     return W.promise( function ( resolve, reject ) {
-        app.server = http.createServer( app.expressApp );
+        app.server = https.createServer( {
+            key: fs.readFileSync( './server.key' ),
+            cert: fs.readFileSync( './server.crt' ),
+            requestCert: false,
+            rejectUnauthorized: false
+        }, app.expressApp );
         app.server.listen( app.port );
         resolve( app );
     });

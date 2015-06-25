@@ -57,7 +57,7 @@ gulp.task( 'js', function () {
 });
 
 gulp.task( 'js-libs', function () {
-    gulp.src( [ './assets/js-libs/jquery*' , './assets/js-libs/*.js' ] )
+    gulp.src( [ './assets/js-libs/jquery*', './assets/js-libs/three.min.js',  './assets/js-libs/OBJLoader.js.js', './assets/js-libs/*.js' ] )
         .pipe( plumber() )
         .pipe( concat( 'libs.js' ) )
         .pipe( uglify() )

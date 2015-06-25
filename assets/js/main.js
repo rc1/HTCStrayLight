@@ -16,13 +16,14 @@ $( function () {
 
             var camera = new THREE.PerspectiveCamera( 70, window.innerWidth / height, 1, 3000 );
             camera.position.y = 0;
-	    camera.position.z = 450;
+	    camera.position.z = 200;
 
             var scene = new THREE.Scene();
 
             var renderer = new THREE.WebGLRenderer( { antialias: false } );
 	    renderer.setPixelRatio( window.devicePixelRatio );
 	    renderer.setSize( window.innerWidth, height );
+            renderer.setClearColor( 0x616264 );
 	    renderer.sortObjects = false;
             
 	    container.appendChild( renderer.domElement );
@@ -44,7 +45,7 @@ $( function () {
             video.height   = 200;
             video.autoplay = true;
 
-            var cubeCamera = new THREE.CubeCamera(1, 1000, 256); // parameters: near, far, resolution
+            var cubeCamera = new THREE.CubeCamera(1, 3000, 256); // parameters: near, far, resolution
             cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter; // mipmap filter
 
             scene.add(cubeCamera);
@@ -63,7 +64,7 @@ $( function () {
                 color: 0xffffff,
 	        side: THREE.BackSide
             });
-            var videoBoxMesh = new THREE.Mesh( new THREE.BoxGeometry( 1000, 1000, 1000 ), videoBoxMaterial );
+            var videoBoxMesh = new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), videoBoxMaterial );
 	    scene.add( videoBoxMesh );
 
 	    // Skybox
@@ -79,58 +80,77 @@ $( function () {
 	    } );
 
             var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1000, 1000, 1000 ), material );
-	    //scene.add( mesh );
+	    // scene.add( mesh );
+
+            // instantiate a loader
+            var loader = new THREE.OBJLoader();
+
+            // load a resource
+            loader.load(
+                // resource URL
+                '/pillow-box.obj',
+                // Function when resource is loaded
+                function ( object ) {
+                    //object.scale.set( 600, 600, 600 );
+                    createOrb( object.children[ 0 ] );
+                }
+            );
 
             // Add Balls
 	    var geometry = new THREE.PlaneGeometry( 10, 10, 3 );
 
-	    for ( var i = 0; i < 100; i ++ ) {
-		// MeshPhongMaterial
-		var ballmaterial = new THREE.MeshPhongMaterial( {
-		    color: 0xe8e2c1,
-		    shininess: 0.0,
-		    specular: 0xffffff ,
-		    envMap: cubeCamera.renderTarget,
-                    reflectivity: 1.0,
-                    side: THREE.DoubleSide
-                    //map: videoTexture
-                });
+            function createOrb( mesh ) {
 
-		var mesh = new THREE.Mesh( geometry, ballmaterial );
-                var anchor = new THREE.Object3D();
-                anchor.add( mesh );
+	        for ( var i = 0; i < 20; i ++ ) {
+		    // MeshPhongMaterial
+		    var ballmaterial = new THREE.MeshPhongMaterial( {
+		        color: 0xe8e2c1,
+		        shininess: 0.0,
+		        specular: 0xffffff ,
+		        envMap: cubeCamera.renderTarget,
+                        reflectivity: 1.0,
+                        side: THREE.DoubleSide
+                        //map: videoTexture
+                    });
 
-                var positionScalar = 300;
-                var speed = W.randomBetween( 0.3, 1 );
+		    //var mesh = new THREE.Mesh( geometry, ballmaterial );
+                    mesh = mesh.clone();
+                    mesh.material = ballmaterial;
 
-                var s = 1.2
-                mesh.scale.set( (1-speed)*s, (1-speed)*s, (1-speed)*s );
-                
-		mesh.position.set(
-		    //( Math.random() - 0.5 ) * positionScalar,
-                    // 0,
-		    W.map( speed, 0.1, 1, positionScalar, positionScalar * 0.2 ),
-                    0,
-                    0
-		    //( Math.random() - 0.5 ) * positionScalar
-		);
+                    mesh.scale.set( 10, 10, 10 );
+                    var anchor = new THREE.Object3D();
+                    anchor.add( mesh );
 
-                anchor.rotation.set( ( Math.random() - 0.5 ) * 1.2, ( Math.random() - 0.5 ) * 1.3, ( Math.random() - 0.5 ) * W.PI_2 );
+                    var positionScalar = 300;
+                    var speed = W.randomBetween( 0.3, 1 );
 
-		mesh.scale.multiplyScalar(10);
-		object.add( anchor );
+                    var s = 1.2
+                    mesh.scale.set( (1-speed)*s, (1-speed)*s, (1-speed)*s );
+                    
+		    mesh.position.set(
+		        //( Math.random() - 0.5 ) * positionScalar,
+                        // 0,
+		        W.map( speed, 0.1, 1, positionScalar/2, positionScalar * 0.2 ),
+                        0,
+                        0
+		        //( Math.random() - 0.5 ) * positionScalar
+		    );
 
-                
+                    anchor.rotation.set( ( Math.random() - 0.5 ) * 1.2, ( Math.random() - 0.5 ) * 1.3, ( Math.random() - 0.5 ) * W.PI_2 );
 
-               actions.push( ( function ( anchor, mesh, speed ) {
-                   return function () {
-                       anchor.rotation.y += W.map( speed, 1, 0, 0.09, 0.00001, W.interpolations.exponentialEaseOut  );
-                       mesh.rotation.x += W.map( speed, 1, 0, 0.09, 0.00001 );
-                       mesh.rotation.y += W.map( speed, 1, 0, 0.09, 0.00001 );
-                       mesh.rotation.z += W.map( speed, 1, 0, 0.09, 0.00001 );
-                   }; 
-               }( anchor, mesh, speed )));
-	    }
+		    mesh.scale.multiplyScalar( 500 );
+		    object.add( anchor );
+
+                    actions.push( ( function ( anchor, mesh, speed ) {
+                        return function () {
+                            anchor.rotation.y += W.map( speed, 1, 0, 0.09, 0.00001, W.interpolations.exponentialEaseOut  );
+                            mesh.rotation.x += W.map( speed, 1, 0, 0.09, 0.00001 );
+                            mesh.rotation.y += W.map( speed, 1, 0, 0.09, 0.00001 );
+                            mesh.rotation.z += W.map( speed, 1, 0, 0.09, 0.00001 );
+                        }; 
+                    }( anchor, mesh, speed )));
+	        }
+            }
 
             scene.add( new THREE.AmbientLight( 0x222222 ) );
 
@@ -140,7 +160,7 @@ $( function () {
 
 	    directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 	    directionalLight.position.set( -2, 1.2, -10 ).normalize();
-	    scene.add( directionalLight );
+	    scene.add( directionalLight );  
 
 
             // Render
@@ -150,8 +170,14 @@ $( function () {
                     videoTexture.needsUpdate = true;
                 }
                 videoBoxMesh.visible = true;
+                object.visible = false;
                 cubeCamera.updateCubeMap(renderer, scene);
+                object.visible = true;
                 videoBoxMesh.visible = false;
+
+                // videoBoxMesh.rotation.x += 0.1;
+                // videoBoxMesh.rotation.y += 0.1;
+                // videoBoxMesh.rotation.z += 0.1;
                 
                 window.requestAnimationFrame( loop );
                 renderer.clear();
