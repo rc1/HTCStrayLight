@@ -1,21 +1,50 @@
+/* jshint esnext: true */
 
+// Main.js
+// =======
+// Entry point of the application.
 
 $( function () {
+
+    // Punter Viz
+    // ==========
+    $( "[data-punter-viz]" )
+        .toArray()
+        .map( function ( el ) {
+
+            // Make the punter application
+            var app = PunterViz.makeApp();
+            // Add out dom element
+            app.containerEl = el;
+
+            // Initailise it
+            PunterViz
+                .initApp( app )
+                .error( function ( err ) {
+                    console.error( 'Failed to create Punter app', err );
+                }) 
+                .success( function ( initalisedPunterApp ) {
+                    console.log( 'Punter application made' );
+                });
+        });
+
+});
+
+/*
 
     // Punters
     // =======
     $( "[data-punter]" )
         .toArray()
-        .map( function ( container ) {
-
-            var actions = [];
+        .map( el => { containerEl: el } )
+        .map( function ( app ) {
 
             var windowHalfX = window.innerWidth / 2;
 	    var windowHalfY = window.innerHeight / 2;
             var height =  window.innerHeight;
 
-            var camera = new THREE.PerspectiveCamera( 70, window.innerWidth / height, 1, 3000 );
-            camera.position.y = 0;
+            var camera = 
+                    camera.position.y = 0;
 	    camera.position.z = 200;
 
             var scene = new THREE.Scene();
@@ -191,3 +220,4 @@ $( function () {
 
 });
 
+*/

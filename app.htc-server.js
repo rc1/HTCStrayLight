@@ -92,8 +92,8 @@ function makeExpressApp ( app ) {
 function makeServer ( app ) {
     return W.promise( function ( resolve, reject ) {
         app.server = https.createServer( {
-            key: fs.readFileSync( './server.key' ),
-            cert: fs.readFileSync( './server.crt' ),
+            key: fs.readFileSync( './assets/ssl-certs/server.key' ),
+            cert: fs.readFileSync( './assets/ssl-certs/server.crt' ),
             requestCert: false,
             rejectUnauthorized: false
         }, app.expressApp );

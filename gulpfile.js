@@ -1,8 +1,10 @@
 // Modules
 // =======
 var path = require( 'path' );
+var fs = require( 'fs' );
 var gulp = require( 'gulp' );
 var less = require( 'gulp-less' );
+var tinylr = require('tiny-lr');
 var sourcemaps = require( 'gulp-sourcemaps' );
 var autoprefixer = require( 'gulp-autoprefixer' );
 var uglify = require( 'gulp-uglify' );
@@ -17,7 +19,18 @@ var babel = require( 'gulp-babel' );
 gulp.task( 'default', [ 'less', 'js', 'js-libs' ] );
 
 gulp.task( 'watch', function () {
-    livereload.listen();
+
+    // Live Reload via HTTPS
+    // ---------------------
+    livereload.server = tinylr({
+        key: fs.readFileSync( './assets/ssl-certs/server.key' ),
+        cert: fs.readFileSync( './assets/ssl-certs/server.crt' )
+    });
+    
+    livereload.server.listen( 35729, function () {
+        console.log( 'Livereload active via https' );
+    });
+    
     gulp.watch( './assets/**/*.less', [ 'less' ] );
     gulp.watch( './assets/js/**/*.js', [ 'js' ] );
     gulp.watch( './assets/js-libs/**/*.js', [ 'js' ] );
@@ -45,7 +58,7 @@ gulp.task( 'less', function () {
 
 gulp.task( 'js', function () {
     gulp
-        .src( [ './assets/js/main.js' ])
+        .src( [ './assets/js/punter-viz.js', './assets/js/main.js' ])
         .pipe( plumber() )
         .pipe( sourcemaps.init() )
         .pipe( babel() )
@@ -57,7 +70,7 @@ gulp.task( 'js', function () {
 });
 
 gulp.task( 'js-libs', function () {
-    gulp.src( [ './assets/js-libs/jquery*', './assets/js-libs/three.min.js',  './assets/js-libs/OBJLoader.js.js', './assets/js-libs/*.js' ] )
+    gulp.src( [ './assets/js-libs/jquery*', './assets/js-libs/three.min.js',  './assets/js-libs/OBJLoader.js', './assets/js-libs/*.js' ] )
         .pipe( plumber() )
         .pipe( concat( 'libs.js' ) )
         .pipe( uglify() )

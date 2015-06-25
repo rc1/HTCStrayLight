@@ -33,6 +33,7 @@
     "markdown": "^0.5.0",
     "orchestrator": "^0.3.7",
     "serve-static": "^1.10.0",
+    "tiny-lr": "^0.1.6",
     "w-js": "^4.42.1"
   }
 }
