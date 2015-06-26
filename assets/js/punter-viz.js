@@ -186,6 +186,17 @@ var PunterViz = (function () {
             
             var particles = [];
 
+            // Add to Scene
+            // ------------
+            app.swarmObject3D = new THREE.Object3D();
+            app.scene.add( app.swarmObject3D );
+            app.preCubeCamRenderFns.push( function () {
+                app.swarmObject3D.visible = false;
+            });
+            app.postCubeCamRenderFns.push( function () {
+                app.swarmObject3D.visible = true;
+            });
+
             // Loader
             // ------
             var loader = new THREE.OBJLoader();
@@ -207,11 +218,12 @@ var PunterViz = (function () {
                 var material = 
                 (function createMore () {
                     if ( particles.length < maxParticles ) {
-                        particles.push( new Particle( mesh ) );
+                        var particle = new Particle( mesh );
+                        app.swarmObject3D.add( particle.anchor );
+                        particles.push( particle );
                         setTimeout( createMore, W.map( particles.length / maxParticles, 0, 1, maxCreationTimeMS, minCreationTime, W.interpolations.easeIn ) );
                     }
                 }());
-                
             }
 
             // Updating
@@ -231,13 +243,13 @@ var PunterViz = (function () {
                 this.mesh.scale.x = Particle.initialScale;
                 this.mesh.scale.y = Particle.initialScale;
                 this.mesh.scale.z = Particle.initialScale;
+
+                // Position
                 var range = 100;
                 this.mesh.position.set( ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range );
                                 
-                // Position
                 this.anchor = new THREE.Object3D();
                 this.anchor.add( this.mesh );
-                app.scene.add( this.anchor );
             }
 
             // ### Static
@@ -250,7 +262,7 @@ var PunterViz = (function () {
                 side: THREE.DoubleSide
             });
 
-            Particle.initialScale = 40;
+            Particle.initialScale = 200;
 
             // ### Method
             Particle.prototype.update = function ( deltaMS, timestampMS ) {
