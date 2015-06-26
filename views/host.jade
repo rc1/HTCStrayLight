@@ -2,12 +2,85 @@ include mixins.jade
 doctype html
 html
     head
-        +head-meta()
-        +head-css()
+        //+head-meta()
         title HTC Mirror Tunnel
+        meta( name='viewport', content='width=device-width, initial-scale=1' )
+        
+        link( rel='stylesheet', type='text/css', href='/jquery-ui-theme/default.min.css' )
+        link( rel='stylesheet', type='text/css', href='/jquery-ui-theme/jquery.mobile.icons.min.css' )
+        link( rel='stylesheet', type='text/css', href='/jquery-ui/jquery.mobile.structure-1.4.5.min.css' )
+        
     body
-   
-        h1 Host
+        mixin footer
+            #footer( data-role='footer', data-position="fixed" )
+                h4 Mirror Control System &mdash; TheWorkers.net
+
+        mixin radio( name, id, value, text )
+            input( type='radio', name=name, id=id, value=value )
+            label( for=id ) #{text}
+                
+        #page-index( data-role='page' )
+            div( data-role='header' )
+                h1 Settings
+            .ui-content( role='main' )
+                 ul( data-role='listview', data-inset='false' )
+                     li: a( href='#page-control-mode' ) Tunnel Control Mode
+                     li: a( href='#page-settings' ) Settings
+                     li: a( href='#page-about' ) About
+            +footer()
+
+                
+        #page-control-mode( data-role='page' )
+            div( data-role='header' )
+                a( href="#page-index" class='ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home' ) Home
+                h1 Control Mode
+            .ui-content( role='main' )
+                form
+                    fieldset( data-role='controlgroup', data-iconpos='right' )
+                        legend Disabled:
+                        +radio( 'control-mode', 'control-mode-off', 'off', 'Off' )
+                        +radio( 'control-mode', 'control-mode-sequence', 'sequence', 'Sequence' )
+                        +radio( 'control-mode', 'control-mode-phone-1', 'phone-1', 'Phone 1' )
+                        +radio( 'control-mode', 'control-mode-phone-2', 'phone-2', 'Phone 2' )
+                        +radio( 'control-mode', 'control-mode-phone-3', 'phone-3', 'Phone 3' )
+                        +radio( 'control-mode', 'control-mode-phone-4', 'phone-4', 'Phone 4' )
+                        +radio( 'control-mode', 'control-mode-manual', 'manual', 'Manual' )
+
+                    ul( data-role='listview', data-inset='true' )
+                        li( data-role="list-divider" ) Manual Controls
+                        li: a( href="" ) Clockwise High
+                        li: a( href="" ) Clockwise Medium
+                        li: a( href="" ) Clockwise Low
+                        li: a( href="" ) Stop
+                        li: a( href="" ) Anti-clockwise Low
+                        li: a( href="" ) Anti-clockwise Medium
+                        li: a( href="" ) Anti-clockwise High
+                            
+            +footer()
+
+        #page-settings( data-role='page' )
+            div( data-role='header' )
+                a( href="#page-index" class='ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home' ) Home
+                h1 Settings
+            .ui-content( role='main' )
+                form
+                    label( for='/config/particles/max' ) Max Particles
+                    input#range( type='range', name='/config/particles/max', data-highlight='true', min=0, max=100, value=50 )
+
+                    legend Options:
+                    input( type='checkbox', id='qwer' )
+                    label( for='qwer' ) Use Camera
+            +footer()
+
+        #page-about( data-role='page' )
+            div( data-role='header' )
+                a( href="#page-index" class='ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home' ) Home
+                h1 About
+            .ui-content( role='main' )
+                p Some info
+            +footer()
+
 
         //-Scripts
         +core-scripts()
+        script( src='/jquery-ui/jquery.mobile-1.4.5.min.js' )

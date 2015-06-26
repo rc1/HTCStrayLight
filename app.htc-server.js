@@ -102,6 +102,12 @@ function makeServer ( app ) {
     });
 }
 
+function makeWSServer ( app ) {
+    return W.promise( function ( resolve, reject ) {
+        
+    });
+}
+
 function makeRepl ( app ) {
     return W.promise( function ( resolve, reject ) {
         if ( app.isLocal ) {

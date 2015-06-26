@@ -80,6 +80,6 @@ gulp.task( 'js-libs', function () {
 });
 
 gulp.task( 'copy', function () {
-    gulp.src( [ './assets/copy/**/*' ] )
+    gulp.src( [ './assets/copy/**/*' ], { base: './assets/copy' })
         .pipe(gulp.dest( './public/' ));
 });
