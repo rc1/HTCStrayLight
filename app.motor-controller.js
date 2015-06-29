@@ -8,7 +8,6 @@ var MotorControl = require( './lib/motor-control' );
 MotorControl
     .init( MotorControl.make() )
     .success( function ( motorControl ) {
-        
         MotorControl.doTestSequence( motorControl );
     });
 
