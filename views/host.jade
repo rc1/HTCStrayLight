@@ -15,19 +15,19 @@ html
             //- #footer( data-role='footer', data-position="fixed" )
             //-   h4 Mirror Control System &mdash; TheWorkers.net
 
-        mixin radio( name, id, value, text )
-            input( type='radio', name=name, id=id, value=value )
+        mixin radio( uri, name, id, value, text )
+            input( data-rest-type='radio-post', data-rest-uri=uri, type='radio', name=name, id=id, value=value )
             label( for=id ) #{text}
                 
-        #page-index( data-role='page' )
-            div( data-role='header' )
-                h1 Settings
-            .ui-content( role='main' )
-                 ul( data-role='listview', data-inset='false' )
-                     li: a( href='#page-control-mode' ) Tunnel Control Mode
-                     li: a( href='#page-settings' ) Settings
-                     li: a( href='#page-about' ) About
-            +footer()
+        // #page-index( data-role='page' )
+        //     div( data-role='header' )
+        //         h1 Settings
+        //     .ui-content( role='main' )
+        //          ul( data-role='listview', data-inset='false' )
+        //              li: a( href='#page-control-mode' ) Control Mode
+        //              // li: a( href='#page-settings' ) Settings
+        //              // li: a( href='#page-about' ) About
+        //     +footer()
 
                 
         #page-control-mode( data-role='page' )
@@ -36,49 +36,97 @@ html
                 h1 Control Mode
             .ui-content( role='main' )
                 form
-                    fieldset( data-role='controlgroup' )
-                        legend Disabled:
-                        +radio( 'control-mode', 'control-mode-manual', 'manual', 'Manual' )
-                        +radio( 'control-mode', 'control-mode-off', 'off', 'Off' )
-                        +radio( 'control-mode', 'control-mode-sequence', 'sequence', 'Sequence' )
-                        +radio( 'control-mode', 'control-mode-phone-1', 'phone-1', 'Phone 1' )
-                        +radio( 'control-mode', 'control-mode-phone-2', 'phone-2', 'Phone 2' )
-                        +radio( 'control-mode', 'control-mode-phone-3', 'phone-3', 'Phone 3' )
-                        +radio( 'control-mode', 'control-mode-phone-4', 'phone-4', 'Phone 4' )
+                    ul( data-role="listview", data-inset="true" )
+                        li( data-role="list-divider") Motor Status
+                        li( style="padding:0;border:0;" )
+                        fieldset( data-rest-type='feildset', data-rest-uri='/motor/controller/is-enabled/', data-role='controlgroup', style='margin:0' ).ui-mini
+                            // legend Control Mode:
+                            +radio( '/motor/controller/is-enabled/', 'is-enabled', 'is-enabled-no', 'no', 'Disabled' )
+                            +radio( '/motor/controller/is-enabled/', 'is-enabled', 'is-enabled-yes', 'yes', 'Enabled' )
+                
+                    ul( data-role="listview", data-inset="true" )
+                        li( data-role="list-divider") Control Mode
+                        li( style="padding:0;border:0;" )
+                        fieldset( data-rest-type='feildset', data-rest-uri='/host/control/mode/', data-role='controlgroup', style='margin:0' ).ui-mini
+                            // legend Control Mode:
+                            +radio( '/host/control/mode/', 'control-mode', 'control-mode-none', 'manual', 'Manual Controls Only' )
+                            +radio( '/host/control/mode/', 'control-mode', 'control-mode-sequence', 'sequence', 'Running Sequence' )
+                            +radio( '/host/control/mode/', 'control-mode', 'control-mode-phone-1', 'phone-1', 'Controlled by Phone 1' )
+                            +radio( '/host/control/mode/', 'control-mode', 'control-mode-phone-2', 'phone-2', 'Controlled by Phone 2' )
+                            +radio( '/host/control/mode/', 'control-mode', 'control-mode-phone-3', 'phone-3', 'Controlled by Phone 3' )
+                            +radio( '/host/control/mode/', 'control-mode', 'control-mode-phone-4', 'phone-4', 'Controlled by Phone 4' )
+        
+                    ul( data-role="listview", data-inset="true" )
+                        li( data-role="list-divider") Motor Direction
+                        li( style="padding:0;border:0;" )
+                        fieldset( data-rest-type='feildset', data-rest-uri='/motor/rotation/direction/', data-role='controlgroup', style='margin:0' ).ui-mini
+                            // legend Control Mode:
+                            +radio( '/motor/rotation/direction/', 'motor-direction', 'motor-direction-forward', 'forward', 'Forward' )
+                            +radio( '/motor/rotation/direction/', 'motor-direction', 'motor-direction-none',  'none', 'None' )
+                            +radio( '/motor/rotation/direction/', 'motor-direction', 'motor-direction-backward', 'backward', 'Backward' )
 
-                    ul( data-role='listview', data-inset='true' )
-                        li( data-role="list-divider" ) Motor State / Manual Override
-                        +radio( 'motor-state', 'motor-state-clockwise-high', 'motor-state-clockwise-high', 'Clockwise High' )
-                        +radio( 'motor-state', 'motor-state-clockwise-medium', 'motor-state-clockwise-medium', 'Clockwise Medium' )
-                        +radio( 'motor-state', 'motor-state-clockwise-low', 'motor-state-clockwise-low', 'Clockwise Low' )
-                        +radio( 'motor-state', 'motor-state-off', 'motor-state-off', 'Off' )
-                        +radio( 'motor-state', 'motor-state-anticlockwise-low', 'motor-state-anticlockwise-low', 'Anticlockwise Low' )
-                        +radio( 'motor-state', 'motor-state-anticlockwise-medium', 'motor-state-anticlockwise-medium', 'Anticlockwise Medium' )
-                        +radio( 'motor-state', 'motor-state-anticlockwise-high', 'motor-state-anticlockwise-high', 'Anticlockwise High' )
+                    ul( data-role="listview", data-inset="true" )
+                        li( data-role="list-divider") Motor Rotation
+                        li( style="padding:0;border:0;" )
+                        fieldset( data-rest-type='feildset', data-rest-uri='/motor/rotation/speed/', data-role='controlgroup', style='margin:0' ).ui-mini
+                            // legend Control Mode:
+                            +radio( '/motor/rotation/speed/', 'motor-rotation', 'motor-rotation-high', 'high', 'High' )
+                            +radio( '/motor/rotation/speed/', 'motor-rotation', 'motor-rotation-medium',  'medium', 'Medium' )
+                            +radio( '/motor/rotation/speed/', 'motor-rotation', 'motor-rotation-low', 'low', 'Low' )
+
+                    //- ul( data-role="listview", data-inset="true" )
+                    //-     li( data-role="list-divider") Motor Speed
+                    //-     li( style="padding:0;border:0;" )
+                    //-     fieldset( data-role='controlgroup', style='margin:0' ).ui-mini
+                    //-         // legend Control Mode:
+                    //-         +radio( 'motor-speed', 'control-mode-nane', 'manual', 'Manual Controls Only' )
+                    //-         +radio( 'motor-speed', 'control-mode-sequence', 'sequence', 'Running Sequence' )
+                    //-         +radio( 'motor-speed', 'control-mode-phone-1', 'phone-1', 'Controlled by Phone 1' )
+                    //-         +radio( 'motor-speed', 'control-mode-phone-2', 'phone-2', 'Controlled by Phone 2' )
+                    //-         +radio( 'motor-speed', 'control-mode-phone-3', 'phone-3', 'Controlled by Phone 3' )
+                    //-         +radio( 'motor-speed', 'control-mode-phone-4', 'phone-4', 'Controlled by Phone 4' )
+                    
+                    // ul( data-role='listview', data-inset='true' ).ui-mini
+                    //     li( data-role="list-divider" ) Motor State
+                    //     li Direction: 
+                    //         strong: span n/a
+                    //     li Speed: 
+                    //         strong: span n/a
+                        
+                    // ul( data-role='listview', data-inset='true' ).ui-mini
+                    //     li( data-role="list-divider" ) Manual Rotation
+                    //     li: a( data-rest-action='post', data-rest-value='forward', data-rest-uri='/motor/rotation/direction/' ).ui-icon-plus Forward
+                    //     li: a( data-rest-action='post', data-rest-value='none', data-rest-uri='/motor/rotation/direction/' ).ui-icon-plus None
+                    //     li: a( data-rest-action='post', data-rest-value='backward', data-rest-uri='/motor/rotation/direction/' ).ui-icon-plus Backward
+                    //     li( data-role="list-divider" ) Manual Speed
+                    //     li: a( data-rest-action='post', data-rest-value='high', data-rest-uri='/motor/rotation/speed/' ).ui-icon-plus High
+                    //     li: a( data-rest-action='post', data-rest-value='medium', data-rest-uri='/motor/rotation/speed/' ).ui-icon-plus Medium
+                    //     li: a( data-rest-action='post', data-rest-value='low', data-rest-uri='/motor/rotation/speed/' ).ui-icon-plus Low
+                        
                             
             +footer()
 
-        #page-settings( data-role='page' )
-            div( data-role='header' )
-                a( href="#page-index" class='ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home' ) Home
-                h1 Settings
-            .ui-content( role='main' )
-                form
-                    label( for='/config/particles/max' ) Max Particles
-                    input#range( type='range', name='/config/particles/max', data-highlight='true', min=0, max=100, value=50 )
+        // #page-settings( data-role='page' )
+        //     div( data-role='header' )
+        //         a( href="#page-index" class='ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home' ) Home
+        //         h1 Settings
+        //     .ui-content( role='main' )
+        //         form
+        //             label( for='/config/particles/max' ) Max Particles
+        //             input#range( type='range', name='/config/particles/max', data-highlight='true', min=0, max=100, value=50 )
 
-                    legend Options:
-                    input( type='checkbox', id='qwer' )
-                    label( for='qwer' ) Use Camera
-            +footer()
+        //             legend Options:
+        //             input( type='checkbox', id='qwer' )
+        //             label( for='qwer' ) Use Camera
+        //     +footer()
 
-        #page-about( data-role='page' )
-            div( data-role='header' )
-                a( href="#page-index" class='ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home' ) Home
-                h1 About
-            .ui-content( role='main' )
-                p Some info
-            +footer()
+        // #page-about( data-role='page' )
+        //     div( data-role='header' )
+        //         a( href="#page-index" class='ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home' ) Home
+        //         h1 About
+        //     .ui-content( role='main' )
+        //         p Some info
+        //     +footer()
 
 
         //-Scripts

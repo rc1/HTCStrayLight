@@ -15,7 +15,7 @@ Restesque Schema
     },
     "host": {
         "control": {
-             "mode": "disabled" | "manual" | "sequence" | "phone-1" |
+             "mode": "manual" | "sequence" | "phone-x"
         }
     },
     "punter": {

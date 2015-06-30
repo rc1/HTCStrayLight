@@ -93,6 +93,7 @@ function doStartPostingHeartBeats ( app ) {
     return W.promise( function ( resolve, reject ) {
         var resolveOnce = once( W.partial( resolve, app ) );
         (function loop () {
+            console.log( 'client should be', app.wsClient );
             RestesqueUtil
                 .now( app.wsClient, '/motor/controller/heartbeat/')
                 .success( function () {
