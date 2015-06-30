@@ -9,7 +9,7 @@
 
 var makeApp = function () {
     return {
-        wsUrl: 'wss://192.168.0.32:7080'
+        wsUrl: 'wss://192.168.0.7:7080'
     };
 };
 
@@ -87,7 +87,7 @@ function makeRestRadioButtons ( app ) {
             .map( function ( $el ) {
                 // Disable real events
                 var $wrapperEl = $el.parent();
-                $wrapperEl.on( 'click touchup', function ( e ) {
+                $wrapperEl.on( 'click touchend', function ( e ) {
                     e.preventDefault();
                     console.log( 'sending',$el.val(), 'to', $el.data( 'restUri' )  );
                     RestesqueUtil.post( app.wsClient, $el.data( 'restUri' ), $el.val() );
