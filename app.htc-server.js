@@ -10,9 +10,13 @@ var fs = require( 'fs' );
 var path = require( 'path' );
 var express = require( 'express' );
 var serveStatic = require( 'serve-static' );
+var ws = require( 'ws' );
 var W = require( 'w-js' );
 var less = require( 'less' );
 var repl = require( 'repl' );
+var redis = require( 'redis' );
+var RedisThreeLevelTreeStorage = require( './lib/restesque/libs/redis-three-level-tree-storage' );
+var RestesqueWebsocketRouter = require( './lib/restesque/libs/restesque-websocket-router.js' );
 
 // Make & Init
 // ===========
@@ -20,12 +24,15 @@ var repl = require( 'repl' );
 function makeWebApp () {
     return {
         port: process.env.PORT || 9999,
+        resdisDb: W.isDefined( process.env.REDIS_DB ) ? Number(  process.env.REDIS_DB ) : 4,
+        redisRootKey: process.env.REDIS_ROOT_KEY || 'mt',
         isLocal: W.isDefined( process.env.IS_LOCAL ) ? Boolean( process.env.IS_LOCAL ) : false
     };
 }
 
 var initWebApp = W.composePromisers( makeExpressApp,
                                      makeServer,
+                                     makeRestesque,
                                      makeReporter( 'OK', 'Server running.' ) );
 
 initWebApp( makeWebApp() ).success( function ( app ) {
@@ -102,12 +109,6 @@ function makeServer ( app ) {
     });
 }
 
-function makeWSServer ( app ) {
-    return W.promise( function ( resolve, reject ) {
-        
-    });
-}
-
 function makeRepl ( app ) {
     return W.promise( function ( resolve, reject ) {
         if ( app.isLocal ) {
@@ -125,8 +126,30 @@ function makeRepl ( app ) {
     });
 }
 
-// Utils
-// =====
+function makeRestesque ( app ) {
+    return W.promise( function ( resolve, reject ) {
+
+        // Web Socket Server
+        // -----------------
+        app.wss = new ws.Server({ server: app.server });
+
+        // Redis
+        // -----
+        app.redisClient = redis.createClient();
+	app.redisClient.select( app.resdisDb );
+        app.redisClient.on( 'error', makeReporter( 'REDIS Error' ) );
+
+        // Storage Mechanism
+        // -----------------
+        var storage = new RedisThreeLevelTreeStorage( app.redisClient );
+
+        // Restesque
+        // ---------
+        RestesqueWebsocketRouter( app.wss, storage, app.redisRootKey );
+
+        resolve( app );
+    });
+}
 
 // Jade
 // ----

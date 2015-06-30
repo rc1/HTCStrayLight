@@ -12,4 +12,7 @@ elif [ "$(uname)" == "Linux" ]; then
 fi
 
 npm install
+pushd lib/restesque
+npm install
+popd
 

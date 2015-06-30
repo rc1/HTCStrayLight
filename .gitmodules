@@ -1,0 +1,3 @@
+[submodule "lib/restesque"]
+	path = lib/restesque
+	url = https://rc1@bitbucket.org/theworkers/restesque.git

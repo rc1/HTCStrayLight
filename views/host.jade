@@ -12,8 +12,8 @@ html
         
     body
         mixin footer
-            #footer( data-role='footer', data-position="fixed" )
-                h4 Mirror Control System &mdash; TheWorkers.net
+            //- #footer( data-role='footer', data-position="fixed" )
+            //-   h4 Mirror Control System &mdash; TheWorkers.net
 
         mixin radio( name, id, value, text )
             input( type='radio', name=name, id=id, value=value )
@@ -36,25 +36,25 @@ html
                 h1 Control Mode
             .ui-content( role='main' )
                 form
-                    fieldset( data-role='controlgroup', data-iconpos='right' )
+                    fieldset( data-role='controlgroup' )
                         legend Disabled:
+                        +radio( 'control-mode', 'control-mode-manual', 'manual', 'Manual' )
                         +radio( 'control-mode', 'control-mode-off', 'off', 'Off' )
                         +radio( 'control-mode', 'control-mode-sequence', 'sequence', 'Sequence' )
                         +radio( 'control-mode', 'control-mode-phone-1', 'phone-1', 'Phone 1' )
                         +radio( 'control-mode', 'control-mode-phone-2', 'phone-2', 'Phone 2' )
                         +radio( 'control-mode', 'control-mode-phone-3', 'phone-3', 'Phone 3' )
                         +radio( 'control-mode', 'control-mode-phone-4', 'phone-4', 'Phone 4' )
-                        +radio( 'control-mode', 'control-mode-manual', 'manual', 'Manual' )
 
                     ul( data-role='listview', data-inset='true' )
-                        li( data-role="list-divider" ) Manual Controls
-                        li: a( href="" ) Clockwise High
-                        li: a( href="" ) Clockwise Medium
-                        li: a( href="" ) Clockwise Low
-                        li: a( href="" ) Stop
-                        li: a( href="" ) Anti-clockwise Low
-                        li: a( href="" ) Anti-clockwise Medium
-                        li: a( href="" ) Anti-clockwise High
+                        li( data-role="list-divider" ) Motor State / Manual Override
+                        +radio( 'motor-state', 'motor-state-clockwise-high', 'motor-state-clockwise-high', 'Clockwise High' )
+                        +radio( 'motor-state', 'motor-state-clockwise-medium', 'motor-state-clockwise-medium', 'Clockwise Medium' )
+                        +radio( 'motor-state', 'motor-state-clockwise-low', 'motor-state-clockwise-low', 'Clockwise Low' )
+                        +radio( 'motor-state', 'motor-state-off', 'motor-state-off', 'Off' )
+                        +radio( 'motor-state', 'motor-state-anticlockwise-low', 'motor-state-anticlockwise-low', 'Anticlockwise Low' )
+                        +radio( 'motor-state', 'motor-state-anticlockwise-medium', 'motor-state-anticlockwise-medium', 'Anticlockwise Medium' )
+                        +radio( 'motor-state', 'motor-state-anticlockwise-high', 'motor-state-anticlockwise-high', 'Anticlockwise High' )
                             
             +footer()
 
