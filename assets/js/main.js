@@ -87,7 +87,7 @@ function makeRestRadioButtons ( app ) {
             .map( function ( $el ) {
                 // Disable real events
                 var $wrapperEl = $el.parent();
-                $wrapperEl.on( 'click touch', function ( e ) {
+                $wrapperEl.on( 'click touchup', function ( e ) {
                     e.preventDefault();
                     console.log( 'sending',$el.val(), 'to', $el.data( 'restUri' )  );
                     RestesqueUtil.post( app.wsClient, $el.data( 'restUri' ), $el.val() );

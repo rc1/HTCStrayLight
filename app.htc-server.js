@@ -5,7 +5,7 @@
 
 // Modules
 // =======
-var https = require( 'https' );
+var https = require( 'httpolyglot' );
 var fs = require( 'fs' );
 var path = require( 'path' );
 var express = require( 'express' );
