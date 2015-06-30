@@ -9,7 +9,9 @@
 
 var makeApp = function () {
     return {
-        wsUrl: 'wss://192.168.0.7:7080'
+        wsUrl: W.join( document.location.protocol === 'https:' ? 'wss://' : 'ws://',
+                       document.location.host, //document.'///'//'wss://192.168.0.7:7080'
+                       '/' )
     };
 };
 
@@ -30,17 +32,21 @@ $( function () {
 
 function makeWebSocketClient ( app ) {
     return W.promise( function ( resolve, reject ) {
+        console.log( 'Connecting to websocket client:', app.wsUrl );
+        
         app.wsClient = new W.JSONSocketConnection({
             socketUrl: app.wsUrl
         });
         
         var resolveOnFirstConnect = once( function () {
+            $( '[data-disconnected-warning]' ).remove();
             report( 'CONNECTED', 'to:', app.wsUrl );
             resolve( app );
         });
 
         app.wsClient.on( 'open', resolveOnFirstConnect );
         app.wsClient.on( 'error', makeReporter( 'Web Socket Error' ) );
+        app.wsClient.on( 'close', makeReporter( 'Web Socket Close' ) );
         app.wsClient.openSocketConnection();
         
     });

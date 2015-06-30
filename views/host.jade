@@ -9,6 +9,14 @@ html
         link( rel='stylesheet', type='text/css', href='/jquery-ui-theme/default.min.css' )
         link( rel='stylesheet', type='text/css', href='/jquery-ui-theme/jquery.mobile.icons.min.css' )
         link( rel='stylesheet', type='text/css', href='/jquery-ui/jquery.mobile.structure-1.4.5.min.css' )
+
+        style.
+            .warning { position: fixed;
+                       top: 20; bottom: 0; left: 0; right: 0;
+                       background-color: rgba( 255,0,0,0.8 );
+                       color: white;
+                       margin-top: 200px;
+                       z-index: 80000; }
         
     body
         mixin footer
@@ -29,6 +37,7 @@ html
         //              // li: a( href='#page-about' ) About
         //     +footer()
 
+        h3( data-disconnected-warning='yes' ).warning Warning Not Connected To Server
                 
         #page-control-mode( data-role='page' )
             div( data-role='header' )

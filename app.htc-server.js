@@ -6,6 +6,7 @@
 // Modules
 // =======
 var https = require( 'https' );
+var httpProxy = require( 'http-proxy' );
 var fs = require( 'fs' );
 var path = require( 'path' );
 var express = require( 'express' );
@@ -23,6 +24,7 @@ var RestesqueWebsocketRouter = require( './lib/restesque/libs/restesque-websocke
 
 function makeWebApp () {
     return {
+        nonSecurePort: W.isDefined( process.env.NON_SECURE_PORT ) ? Number( process.env.NON_SECURE_PORT ) : 7081,
         port: process.env.PORT || 7080,
         resdisDb: W.isDefined( process.env.REDIS_DB ) ? Number(  process.env.REDIS_DB ) : 4,
         redisRootKey: process.env.REDIS_ROOT_KEY || 'mt',
@@ -34,6 +36,7 @@ var initWebApp = W.composePromisers( makeExpressApp,
                                      makeServer,
                                      makeRestesque,
                                      makeRepl,
+                                     makeHttpToHttpsProxy,
                                      makeReporter( 'OK', 'Server running.' ) );
 
 initWebApp( makeWebApp() ).success( function ( app ) {
@@ -151,6 +154,19 @@ function makeRestesque ( app ) {
         // ---------
         RestesqueWebsocketRouter( app.wss, storage, app.redisRootKey );
 
+        resolve( app );
+    });
+}
+
+function makeHttpToHttpsProxy ( app ) {
+    return W.promise( function ( resolve, reject ) {
+        app.httpProxy = httpProxy
+            .createProxyServer( { target: 'https://localhost:' + app.port + '/',
+                                  secure: false,
+                                  ws: true } )
+            .listen( app.nonSecurePort );
+                                                    
+        report( 'OK', 'Non-https proxy running on:', app.nonSecurePort );
         resolve( app );
     });
 }
