@@ -15,7 +15,7 @@ var RestesqueUtil = require( './lib/restesque/example/restesque-util-node.js' );
 var makeApp = function () {
     return {
         wsPort: W.isDefined( process.env.WS_PORT ) ? process.env.WS_PORT : 7080,
-        isEnabled: false
+        isEnabled: true
     };
 };
 
@@ -23,6 +23,7 @@ var initApp = W.composePromisers( makeMotorInterface,
                                   // doRunMotorInterfaceTestSequence,
                                   makeWebSocketClient,
                                   doStartPostingHeartBeats,
+                                  doPostMotorDirectionToNone,
                                   subscribeToIsEnabled,
                                   subscribeRotationDirection,
                                   subscribeRotationSpeed );
@@ -75,14 +76,25 @@ function makeWebSocketClient ( app ) {
     });
 }
 
+function doPostMotorDirectionToNone ( app ) {
+    return W.promise( function ( resolve, reject ) {
+        RestesqueUtil.post( app.wsClient, '/motor/rotation/direction/', 'none' ).success( W.partial( resolve, app ) );
+    });
+}
+
 function subscribeToIsEnabled ( app ) {
     return W.promise( function ( resolve, reject ) {
         RestesqueUtil.subscribeWithInitialGet( app.wsClient, '/motor/controller/is-enabled/', function ( packet ) {
-            if ( app.isEnabled != packet.getBody() && packet.getBody() !== 'yes' ) {
+
+            var incomingValue = packet.getBody() === 'yes' ? true : false;
+            
+            console.log( 'Recivedd is enabled', incomingValue );
+            if ( app.isEnabled !== incomingValue && incomingValue === false ) {
                 MotorInterface.doSetRotationNone( app.motorInterface );
+                RestesqueUtil.post( app.wsClient, '/motor/rotation/direction/', 'none' );
                 report( 'DISABLEING MOTORS', 'done' );
             }
-            app.isEnabled = packet.getBody() === 'yes' ? true : false;
+            app.isEnabled = incomingValue;
             
         }).success( W.partial( resolve, app ) );
     });
@@ -93,7 +105,6 @@ function doStartPostingHeartBeats ( app ) {
     return W.promise( function ( resolve, reject ) {
         var resolveOnce = once( W.partial( resolve, app ) );
         (function loop () {
-            console.log( 'client should be', app.wsClient );
             RestesqueUtil
                 .now( app.wsClient, '/motor/controller/heartbeat/')
                 .success( function () {
@@ -108,9 +119,9 @@ function subscribeRotationDirection ( app ) {
     return W.promise( function ( resolve, reject ) {
         RestesqueUtil.subscribeWithInitialGet( app.wsClient, '/motor/rotation/direction/', function ( packet ) {
             // Allow none to go through always
-            if ( !app.isEnabled && packet.getBody() === 'forward' ) {
+            if ( app.isEnabled && packet.getBody() === 'forward' ) {
                 MotorInterface.doSetRotationForward( app.motorInterface );
-            } else if ( !app.isEnabled && packet.getBody() === 'backward' ) {
+            } else if ( app.isEnabled && packet.getBody() === 'backward' ) {
                 MotorInterface.doSetRotationBackward( app.motorInterface );
             } else if ( packet.getBody() === 'none' ) {
                 MotorInterface.doSetRotationNone( app.motorInterface );
