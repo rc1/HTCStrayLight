@@ -6,10 +6,10 @@ Restesque Schema
     "motor": {
         "controller": {
             "heartbeat": NOW,
-            "is-disabled": y/n
+            "is-enabled": y/n
         },
         "rotation: {
-            "state": "forward" | "none" | "backward",
+            "direction": "forward" | "none" | "backward",
             "speed": "high" | "low" | "medium"
         }
     },

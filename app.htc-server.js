@@ -23,7 +23,7 @@ var RestesqueWebsocketRouter = require( './lib/restesque/libs/restesque-websocke
 
 function makeWebApp () {
     return {
-        port: process.env.PORT || 9999,
+        port: process.env.PORT || 7080,
         resdisDb: W.isDefined( process.env.REDIS_DB ) ? Number(  process.env.REDIS_DB ) : 4,
         redisRootKey: process.env.REDIS_ROOT_KEY || 'mt',
         isLocal: W.isDefined( process.env.IS_LOCAL ) ? Boolean( process.env.IS_LOCAL ) : false

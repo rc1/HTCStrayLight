@@ -32,10 +32,10 @@ html(lang="en")
                               - var width = 50
                               - var root = '/motor/'
                               li -- Controller --
-                              +item( cols=width, uri=root+'controller/is-disabled/',  key='Is Disabled',  ui='toggle-yes-no' )
+                              +item( cols=width, uri=root+'controller/is-enabled/',  key='Is Enabled',  ui='toggle-yes-no' )
                               +item( cols=width, uri=root+'controller/heartbeat/',  key='Heartbeat',  formatter='time-ago' )
                               li -- Rotation --
-                              +item( cols=width, uri=root+'rotation/state/',  key='State',  formatter='char-limit', char-limit='40', ui='text-line' )
+                              +item( cols=width, uri=root+'rotation/direction/',  key='Direction',  formatter='char-limit', char-limit='40', ui='text-line' )
                               +item( cols=width, uri=root+'rotation/speed/',  key='Speed',  formatter='char-limit', char-limit='40', ui='text-line' )
 
             .row
@@ -69,7 +69,7 @@ html(lang="en")
                               mixin phone( cid )
                                   li -- Phone #{cid} --
                                   +item( cols=width, uri=root+'phone-'+cid+'/heartbeat/',  key='Heartbeat',  formatter='time-ago' )
-                                  +item( cols=width, uri=root+'phone-'+cid+'/rotation/',  key='Rotation',  formatter='range', ui='slide', min=-50, max=50, step='1' )
+                                  +item( cols=width, uri=root+'phone-'+cid+'/rotation/',  key='Rotation',  formatter='range', ui='slide', min=-50, max=5 0, step='1' )
                               +phone( 1 )
                               +phone( 2 )
                               +phone( 3 )
