@@ -7,8 +7,8 @@ var MotorInterface = require( './lib/motor-interface' );
 
 MotorInterface
     .init( MotorInterface.make() )
-    .success( function ( motorControlInterface ) {
-        // MotorInterface.doTestSequence( motorInterface );
+    .success( function ( motorInterface ) {
+        MotorInterface.doTestSequence( motorInterface );
 
         
     });
