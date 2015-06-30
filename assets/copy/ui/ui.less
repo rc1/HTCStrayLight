@@ -1,0 +1,265 @@
+@import "reset.less";
+
+body, html {
+    width: 100%;
+    height: 100%;
+    font-family: Monaco, Consolas, "Lucida Console", monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: @grey2;
+}
+
+// # Block
+@block: 20px;
+
+// # Layout
+
+#header {
+    box-sizing: border-box;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-left: @block;
+    padding-top: @block / 2px;
+    padding-bottom: @block / 2px;
+    background-color: rgba( 255,255,255,0.9 );
+    box-shadow: 0 3px 5px rgba( 0,0,0,0.1 );
+}
+
+#state {
+}
+
+#panels {
+    margin-top: @block * 4px;
+}
+
+// # Color
+
+@white: #FFFFFF;
+@black: #000000;
+@grey1: #707070;
+@grey2: #bdbdbd;
+@green: #00FF00;
+@red: #FF0000;
+@red-light: #ff5f5f;
+@yellow: #FFFF00;
+@orange: #ff8a00;
+@orange-light: #ffbe71;
+@blue: #476cff;
+@blue-light: #c0cdff;
+
+// # Text
+// ## Generic
+
+h1 {
+    text-transform: uppercase;
+    color: @black;
+    span {
+        color: @grey1;
+        text-transform: none;
+    }
+}
+
+h2 {
+    text-transform: uppercase;
+    color: @black;
+}
+
+h3 {
+    color: @black;
+}
+
+// ## Specalised
+
+.hand { cursor: pointer; }
+
+.key, .value { color: @grey1; }
+.dots { color: @grey2; }
+
+//.value {
+.ok {
+    color: @green;
+}
+.better {
+    color: @blue-light;
+}
+.bad {
+    color: @red;
+}
+.not-so-bad {
+    color: @red-light;
+}
+.warning {
+    color: @orange;
+}
+.info {
+    color: @red;
+}
+//}
+
+.badge {
+    padding-left: 4px;
+    padding-right: 4px;
+    display: inline-block;
+    color: white;
+    font-size: 8px;
+
+    &.ok {
+        background-color: @green;
+    }
+    &.bad {
+        background-color: @red;
+    }
+    &.warning {
+        background-color: @orange;
+    }
+    &.info {
+        background-color: @red;
+    }
+}
+
+.edit {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: -2px;
+    //background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFVJREFUeNpiYcACWNjZ9YHUARCbCY+kAIYCNMkPQOzAhE/yz8+fF9GteIAsCdYI1MkPlQCBAJACmCRYARAXIBl7ASj5EdlIkBUJQNwAxArokiAAEGAAh2ghNwszV0oAAAAASUVORK5CYII=');
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2hpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDowMTgwMTE3NDA3MjA2ODExODIyQUM2OEM3RTUzMUY1RiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo5MTVBOUNGQUU5N0YxMUUzQTFGM0I1N0U1MjQwODAzOCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo5MTVBOUNGOUU5N0YxMUUzQTFGM0I1N0U1MjQwODAzOCIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChNYWNpbnRvc2gpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MDI4MDExNzQwNzIwNjgxMTgyMkFDNjhDN0U1MzFGNUYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MDE4MDExNzQwNzIwNjgxMTgyMkFDNjhDN0U1MzFGNUYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6CFX4nAAAAU0lEQVR42mJsbv7PgAXoA/EBEIMJj6QANgXIkh+A2IEJnyQQX0Q34QGyJEiABYj5oRIgEABVcBGmA6SgAMnYC0D8EdlIkBUJQNwAxArokiAAEGAA7jEUOVVjafsAAAAASUVORK5CYII=');
+}
+
+// # Panels
+
+.row {
+    padding-left: @block;
+}
+
+.panel {
+
+    vertical-align: top;
+
+    display: inline-block;
+    padding-bottom: @block * 2;
+    padding-right: @block * 2;
+
+    .wrap {
+        vertical-align: top;
+        display: inline-block;
+        margin-right: @block;
+        margin-left: @block;
+    }
+
+    .fringe {
+        width: @block / 2px;
+        display: inline-block;
+        vertical-align: top;
+        color: @black;
+        .expander {
+            cursor: pointer;
+        }
+    }
+
+    .content {
+        display: inline-block;
+    }
+
+    li {
+
+        position: relative;
+        background-color: @white;
+        width: 100%;
+
+        @ui-height: @block - 2px;
+
+        .slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: @ui-height;
+            
+            .bar {
+                height: @ui-height;
+                &.formatter {
+                    z-index: 5px;
+                    background-color: @green;
+                }
+                &.ui {
+                    z-index: 2px;
+                    border-right:  3px solid @orange;
+                }
+            }
+        }
+
+        &:hover {
+            .trigger {
+                visibility: visible;
+            }
+        }
+
+        .trigger {
+            visibility: hidden;
+            cursor: pointer;
+
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: @ui-height;
+            z-index: 11px;
+            text-align: center;
+        }
+
+        .box {
+            color:white;
+            padding-left: 3px;
+            padding-right: 3px;
+            display: inline-block;
+            background-color: @red-light;
+            &.live {
+                background-color: @blue-light;
+            }
+        }
+
+        .done {
+            background-color: @orange-light;
+            color: white;
+        }
+
+        .info {
+            background-color: rgba( 255, 255, 255, 0.7 );
+            position: relative;
+            top: 0;
+            z-index: 10px;
+        }
+
+    }
+
+    li:hover {
+        background-color: @yellow;
+    }
+
+    h3 {
+        padding-top: 10px;
+    }
+}
+
+.arrows {
+
+    .arrow-btn {
+        width: 20px;
+        height: 20px;
+        border: 1px solid black;
+
+        display: inline-block;
+
+        &.up {    background: url('../image/arrow-up.png'); margin-left: 30px; }
+        &.down {  background: url('../image/arrow-down.png');  }
+        &.left {  background: url('../image/arrow-left.png');  }
+        &.right { background: url('../image/arrow-right.png');  }
+    }
+
+    
+
+}

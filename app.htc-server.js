@@ -33,6 +33,7 @@ function makeWebApp () {
 var initWebApp = W.composePromisers( makeExpressApp,
                                      makeServer,
                                      makeRestesque,
+                                     makeRepl,
                                      makeReporter( 'OK', 'Server running.' ) );
 
 initWebApp( makeWebApp() ).success( function ( app ) {
@@ -88,6 +89,9 @@ function makeExpressApp ( app ) {
         app.expressApp.get( '/host/', function ( req, res ) {
             res.render( 'host', makeJadeData( app ) );
         });
+
+        // ### Controller
+        app.expressApp.get( '/controller.ui', ( req, res ) => res.render( 'ui/controller.ui.jade', {} ) );
 
         // ### W.js Clientside
         app.expressApp.get( '/W.min.js', W.jsMinMiddleware() );
@@ -162,6 +166,7 @@ function makeJadeData ( app ) {
 
 // Reporting
 // ---------
+
 function report( status, str ) {
     console.log( '[', status, ']', W.rest( W.toArray( arguments ) ).join( ' ' ) );
 }

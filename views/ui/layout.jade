@@ -1,0 +1,46 @@
+// - Config
+- var sensorRangeMax=500000
+// - UI Elements
+mixin item( )
+    - var value = whenDefinedElse( attributes.value, 'n/a' ); 
+    - var numberOfDotsNeeded = attributes.cols - ( attributes.key.length + value.length );
+    - var dots = Array( (numberOfDotsNeeded>0) ? numberOfDotsNeeded : 4 ).join('.')
+    li( data-bind-key=attributes.key, data-bind-uri=attributes.uri, data-bind-cols=attributes.cols, data-bind-value=value, data-bind-formatter=attributes.formatter, data-bind-ui=attributes.ui, data-bind-min=attributes.min, data-bind-max=attributes.max, data-bind-step=attributes.step, data-bind-char-limit=attributes['char-limit'] )
+
+        //- Sliders
+        if ( attributes.formatter === 'range' )
+            .slider.formatter
+                .bar.formatter
+
+        .info
+            span.key #{ attributes.key }
+            span.dots #{ dots }
+            span.value !{ value }
+
+        //- UI
+
+        if ( attributes.ui === 'text-line' )
+            .text-line
+                .enable
+                    .trigger.ui.now 
+                        .box.non-live edit
+                        .box.live live edit
+                .input
+                    input( type='text' )
+                    .send.box.hand  send
+                    .done.box.hand  done
+
+        if ( attributes.ui === 'slide' )
+            .slider.ui
+                .bar.ui
+
+        if ( attributes.ui === 'now' )
+            if ( block )
+                block
+            else
+                .trigger.ui.now 
+                    .text.box trigger
+
+        if ( attributes.ui === 'toggle-yes-no' )
+            .trigger.ui.toggle 
+                .text.box toggle

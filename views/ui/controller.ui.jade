@@ -1,0 +1,151 @@
+doctype html
+include layout
+html(lang="en")
+    //- Includes
+    head
+        title *Controller* - After Dark
+        link( rel='stylesheet', type='text/css', href='ui/ui.css' )
+    body
+        // - utils
+        - function whenDefinedElse( value, alternative )  {
+        -   return ( typeof value !== 'undefined' ) ? value : alternative;
+        - }
+
+        #header
+            h1 Mirror Tunnel 
+                span Controller
+
+            #state
+                .badge.connection.bad DISCONNECTED
+
+        #panels
+
+            .row
+                .panel
+                     .fringe: .expander -
+                     .content
+                         h2 Motor Controller
+                         .wrap
+                              h3 Motor
+                                  .edit
+                              ul
+                              - var width = 50
+                              - var root = '/motor/'
+                              li -- Controller --
+                              +item( cols=width, uri=root+'controller/is-disabled/',  key='Is Disabled',  ui='toggle-yes-no' )
+                              +item( cols=width, uri=root+'controller/heartbeat/',  key='Heartbeat',  formatter='time-ago' )
+                              li -- Rotation --
+                              +item( cols=width, uri=root+'rotation/state/',  key='State',  formatter='char-limit', char-limit='40', ui='text-line' )
+                              +item( cols=width, uri=root+'rotation/speed/',  key='Speed',  formatter='char-limit', char-limit='40', ui='text-line' )
+
+            .row
+                .panel
+                     .fringe: .expander -
+                     .content
+                         h2 Host
+                         .wrap
+                              h3 Motor
+                                  .edit
+                              ul
+                              - var width = 50
+                              - var root = '/host/'
+                              li -- Control --
+                              +item( cols=width, uri=root+'control/mode/',  key='Mode',  formatter='char-limit', char-limit='40', ui='text-line' )
+
+
+            .row
+                .panel
+                     .fringe: .expander -
+                     .content
+                         h2 Host
+                         .wrap
+                              h3 Punter
+                                  .edit
+                              ul
+                              - var width = 50
+                              - var root = '/punter/'
+                              li -- Config --
+                              //+item( cols=width, uri=root+'control/mode/',  key='Mode',  formatter='char-limit', char-limit='40', ui='text-line' )
+                              mixin phone( cid )
+                                  li -- Phone #{cid} --
+                                  +item( cols=width, uri=root+'phone-'+cid+'/heartbeat/',  key='Heartbeat',  formatter='time-ago' )
+                                  +item( cols=width, uri=root+'phone-'+cid+'/rotation/',  key='Rotation',  formatter='range', ui='slide', min=-50, max=50, step='1' )
+                              +phone( 1 )
+                              +phone( 2 )
+                              +phone( 3 )
+                              +phone( 4 )
+                                                        
+
+            // .row
+            //     .panel
+            //         .fringe: .expander -
+            //         .content
+            //             h2 x24
+            //             .wrap
+            //                 h3 Mode
+            //                     .edit
+            //                 ul
+            //                     - var width = 25;
+            //                     +item( cols=width, uri='/x24/config/debug/',  key='Debug',  ui='toggle-yes-no' )
+            //                     +item( cols=width, uri='/x24/config/git/',    key='Image',  formatter='char-limit', char-limit='30', ui='text-line' )
+            //                     +item( cols=width, uri='/x24/config/invert/',    key='Invert',  ui='toggle-yes-no' )
+            //                     // +item( cols=width, uri='/x24/config/launch/', key='Launch', formatter='time-ago', ui='now' )
+            //                     // +item( cols=width, uri='/x24/config/kill/',   key='Kill',   formatter='time-ago', ui='now' )
+
+            // mixin screen ( x, y )
+            //                 - var width = 33;
+            //                 - var root = '/screens/' + x + '_' + y
+            //                 h3 Screen #{x} _ #{y}
+            //                 ul
+            //                     li -- Display  --
+            //                     +item( cols=width, uri=root+'/image/',  key='Image',    formatter='char-limit', char-limit='30', ui='text-line' )
+            //                     // +item( cols=width, uri=root+'/kill/',   key='Kill',     formatter='time-ago', ui='now' )
+            //                     // +item( cols=width, uri=root+'/kill-self/',   key='Kill Self',     formatter='time-ago', ui='now' )
+            //                     +item( cols=width, uri=root+'/launch/', key='Launch',   formatter='time-ago', ui='now' )
+            //                     +item( cols=width, uri=root+'/mac-target/',        key='Mac Target',        formatter='char-limit', char-limit='30', ui='text-line' )
+            //                     li -- State --
+            //                     +item( cols=width, uri=root+'/heartbeat/',  key='Heartbeat',  formatter='time-ago' )
+            //                     +item( cols=width, uri=root+'/mac-latest/',        key='Mac Latest',        formatter='char-limit', char-limit='30' )
+            //                     +item( cols=width, uri=root+'/ip/',         key='IP',         formatter='char-limit', char-limit='30' )
+            //                     // li -- Content --
+            //                     // +item( cols=width, uri=root+'/pull/',       key='Pull',     formatter='time-ago', ui='now' )
+            //                     // +item( cols=width, uri=root+'/pull-requested/',       key='Pull Requested',     formatter='time-ago' )
+            //                     // +item( cols=width, uri=root+'/clone/',      key='Clone',    formatter='time-ago', ui='now' )
+            //                     // +item( cols=width, uri=root+'/clone-requested/',      key='Clone Requested',    formatter='time-ago' )
+            //                     // +item( cols=width, uri=root+'/latest/',     key='Latest',   formatter='time-ago' )
+
+            // .row
+            //     .panel
+            //         .fringe: .expander -
+            //         .content
+            //             h2 Unlinked screen
+            //             .wrap
+            //                 +screen( -1, -1 )
+            // .row
+            //     - for ( var y = 0; y < 3; ++y )
+            //         .panel
+            //             .fringe: .expander -
+            //             .content
+            //                 h2 Row #{y}
+            //                 .wrap
+            //                     - for ( var x = 0; x < 8; ++x )
+            //                         +screen( x, y )
+
+            // .row
+            //     h2 Mac Addresses
+            //     pre#macAddresses
+
+                                    
+            //- Libraries
+            script( src='ui/js/libs/jquery-2.1.0.min.js' )
+            script( src='ui/js/libs/W.min.js' )
+            script( src='ui/js/libs/restesque.js' )
+            script( src='ui/js/libs/lodash.min.js' )
+            script( src='ui/js/connection-state.js' )
+
+            script.
+                var connectTo = 'wss://localhost:7080/';
+
+            //- Main
+            script( src='ui/js/main.ui.js' )
+ 

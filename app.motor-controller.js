@@ -2,12 +2,14 @@
 // =============
 // Client application to control the motors
 
-var MotorControl = require( './lib/motor-control' );
+var MotorInterface = require( './lib/motor-interface' );
 
 
-MotorControl
-    .init( MotorControl.make() )
-    .success( function ( motorControl ) {
-        MotorControl.doTestSequence( motorControl );
+MotorInterface
+    .init( MotorInterface.make() )
+    .success( function ( motorControlInterface ) {
+        // MotorInterface.doTestSequence( motorInterface );
+
+        
     });
 
