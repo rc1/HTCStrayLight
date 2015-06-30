@@ -9,7 +9,7 @@
 
 var makeApp = function () {
     return {
-        wsUrl: 'wss://localhost:7080'
+        wsUrl: 'wss://192.168.0.32:7080'
     };
 };
 
