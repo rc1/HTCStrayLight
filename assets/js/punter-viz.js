@@ -194,7 +194,6 @@ var PunterViz = (function () {
                 app.swarmObject3D.visible = false;
             });
             app.postCubeCamRenderFns.push( function () {
-                console.log( 'hello!' );
                 app.swarmObject3D.visible = true;
             });
 

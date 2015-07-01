@@ -66,6 +66,9 @@ function makePunterVizs ( app ) {
                 app.punterViz.containerEl = el;
 
                 // Initailise it
+
+                var FORWARDS_HIGH = [ [ '/' ] ] 
+                
                 PunterViz
                     .initApp( app.punterViz )
                     .error( function ( err ) {
@@ -73,7 +76,42 @@ function makePunterVizs ( app ) {
                     }) 
                     .success( function ( initalisedPunterApp ) {
                         console.log( 'Punter application made' );
+
+                        var rotationStep = 25.714285714;
+
+                        // Add the rotation controls
+                        // gamma right 90, left -90
+                        var gammaStream = $( window )
+                                .asEventStream( 'deviceorientation' )
+                                .map( e => e.originalEvent.gamma );
+
+                        // [ bh, bm, bl, n, fl, fm, fh ]
                         
+                        // Forwards & Backwards
+                        gammaStream
+                            .map( function ( g ) {
+                                if ( g < -rotationStep ) { return 'backward'; }
+                                else if ( g > rotationStep ) { return 'forward'; }
+                                else { return 'none'; } 
+                            })
+                            .skipDuplicates()
+                            .throttle( 100 )
+                            .onValue( function ( direction ) {
+                                RestesqueUtil.post( app.wsClient, '/motor/rotation/direction/', direction );
+                            });
+
+                        // Speed
+                        gammaStream
+                            .map( g => Math.abs( g ) )
+                            .map( function ( g ) {
+                                if ( g > 90 - rotationStep ) { return 'high'; }
+                                else if ( g > 90 - ( rotationStep * 2 ) ) { return 'medium'; }
+                                else { return 'low'; }
+                            })
+                            .throttle( 100 )
+                            .onValue( function ( speed ) {
+                                RestesqueUtil.post( app.wsClient, '/motor/rotation/speed/', speed );
+                            });
                     });
             });
         resolve( app );
