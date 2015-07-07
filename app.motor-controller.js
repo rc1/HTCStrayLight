@@ -85,20 +85,7 @@ function doPostMotorDirectionToNone ( app ) {
 function subscribeToIsEnabled ( app ) {
     return W.promise( function ( resolve, reject ) {
         RestesqueUtil.subscribeWithInitialGet( app.wsClient, '/motor/controller/is-enabled/', function ( packet ) {
-
-            var incomingValue = packet.getBody() === 'yes' ? true : false;
-            
-            console.log( 'Recieved is enabled', incomingValue );
-            
-            if ( app.isEnabled !== incomingValue && incomingValue === false ) {
-                MotorInterface.doSetRotationNone( app.motorInterface );
-                RestesqueUtil.post( app.wsClient, '/motor/rotation/direction/', 'none' );
-                report( 'DISABLEING MOTORS', 'done' );
-            }
-            app.isEnabled = incomingValue;
-
-            MotorInterface.doSetEnabled( app.MotorInterface, incomingValue );
-            
+            MotorInterface.doSetEnabled( app.MotorInterface,  packet.getBody() === 'yes' ? true : false );
         }).success( W.partial( resolve, app ) );
     });
 }
