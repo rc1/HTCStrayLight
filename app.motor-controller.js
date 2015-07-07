@@ -88,13 +88,16 @@ function subscribeToIsEnabled ( app ) {
 
             var incomingValue = packet.getBody() === 'yes' ? true : false;
             
-            console.log( 'Recivedd is enabled', incomingValue );
+            console.log( 'Recieved is enabled', incomingValue );
+            
             if ( app.isEnabled !== incomingValue && incomingValue === false ) {
                 MotorInterface.doSetRotationNone( app.motorInterface );
                 RestesqueUtil.post( app.wsClient, '/motor/rotation/direction/', 'none' );
                 report( 'DISABLEING MOTORS', 'done' );
             }
             app.isEnabled = incomingValue;
+
+            MotorInterface.doSetEnabled( app.MotorInterface, incomingValue );
             
         }).success( W.partial( resolve, app ) );
     });
@@ -118,10 +121,9 @@ function doStartPostingHeartBeats ( app ) {
 function subscribeRotationDirection ( app ) {
     return W.promise( function ( resolve, reject ) {
         RestesqueUtil.subscribeWithInitialGet( app.wsClient, '/motor/rotation/direction/', function ( packet ) {
-            // Allow none to go through always
-            if ( app.isEnabled && packet.getBody() === 'forward' ) {
+            if ( packet.getBody() === 'forward' ) {
                 MotorInterface.doSetRotationForward( app.motorInterface );
-            } else if ( app.isEnabled && packet.getBody() === 'backward' ) {
+            } else if ( packet.getBody() === 'backward' ) {
                 MotorInterface.doSetRotationBackward( app.motorInterface );
             } else if ( packet.getBody() === 'none' ) {
                 MotorInterface.doSetRotationNone( app.motorInterface );
