@@ -22,8 +22,10 @@ var PunterViz = (function () {
 
     var initApp = W.composePromisers( makeCameraSceneRenderer,
                                       makeWebCamTexture,
+                                      makeWebCamMaterial,
                                       makeCubeCam,
-                                      makeWebCamBoxMesh,
+                                      // makeWebCamBoxMesh,
+                                      makeWebCamHedronMesh,
                                       makeSwarm,
                                       makeLights,
                                       makeRenderLoop );
@@ -119,6 +121,20 @@ var PunterViz = (function () {
         });
     }
 
+    // Web Cam Material
+    // ----------------
+    function makeWebCamMaterial ( app ) {
+        return W.promise( function ( resolve, reject ) {
+            app.webCamMaterial = new THREE.MeshBasicMaterial({
+                map: app.webCamTexture,
+                color: 0xffffff,
+	        side: THREE.DoubleSide
+            });
+            resolve( app );
+        });
+
+    }
+
     // Web Cam Box Mesh
     // ----------------
     // Creates a box with the web cam displayed
@@ -126,13 +142,7 @@ var PunterViz = (function () {
     function makeWebCamBoxMesh ( app ) {
         return W.promise( function ( resolve, reject ) {
             
-            var webCamBoxMaterial = new THREE.MeshBasicMaterial({
-                map: app.webCamTexture,
-                color: 0xffffff,
-	        side: THREE.BackSide
-            });
-            
-            app.webCamvBoxMesh = new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), webCamBoxMaterial );
+            app.webCamvBoxMesh = new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), app.webCamMaterial );
 
             var rotationX = W.randomBetween( 0.0002, 0.00002 );
             var rotationY = W.randomBetween( 0.0002, 0.00002 );
@@ -156,9 +166,54 @@ var PunterViz = (function () {
                 app.webCamvBoxMesh.visible = true;
             });
 
-            
-
             resolve( app );
+        });
+    }
+
+    // Web Cam Hedron Mesh
+    // -------------------
+    function makeWebCamHedronMesh ( app ) {
+        return W.promise( function ( resolve, reject ) {
+
+            // Loader
+            // ------
+            var loader = new THREE.OBJLoader();
+            loader.load( '/obj/hedron.obj', onObjLoaded );
+
+            // Swarm Creation
+            // ----------------
+            function onObjLoaded ( obj ) {
+                console.log( obj.children[ 0 ] );
+                app.webCamHedronMesh = obj.children[ 0 ].clone(); //new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), material );
+                app.webCamHedronMesh.material = app.webCamMaterial;
+                var scale = 2800;
+                app.webCamHedronMesh.scale.set( scale, scale, scale );
+
+                var rotationX = W.randomBetween( 0.0002, 0.00002 );
+                var rotationY = W.randomBetween( 0.0002, 0.00002 );
+                var rotationZ = W.randomBetween( 0.0002, 0.00002 );
+                
+                // If we want to rotate it
+                addPreRenderFn( app, function ( deltaMS, timestampMS ) {
+                    app.webCamHedronMesh.rotation.x += ( deltaMS * rotationX );
+                    app.webCamHedronMesh.rotation.y += ( deltaMS * rotationY );
+                    app.webCamHedronMesh.rotation.z += ( deltaMS * rotationZ );
+                });
+                
+	        app.scene.add( app.webCamHedronMesh );
+
+                // Show it only for the cube cam
+                app.preCubeCamRenderFns.push( function () {
+                    app.webCamHedronMesh.visible = true;
+                });
+
+                app.postCubeCamRenderFns.push( function () {
+                    app.webCamHedronMesh.visible = true;
+                });
+
+                resolve( app );
+            }
+            
         });
     }
 
@@ -197,35 +252,6 @@ var PunterViz = (function () {
                 app.swarmObject3D.visible = true;
             });
 
-            // Loader
-            // ------
-            var loader = new THREE.OBJLoader();
-            loader.load( '/obj/pillow-box.obj', onObjLoaded );
-
-            // Swarm Creation
-            // ----------------
-            function onObjLoaded ( obj ) {
-
-                var mesh = obj.children[ 0 ];
-
-                // Particle Creation
-                // -----------------
-                // Ease in the creation of the particles
-                var maxParticles = 100;
-                var minCreationTime = 5;
-                var maxCreationTimeMS = 100;
-
-                var material = 
-                (function createMore () {
-                    if ( particles.length < maxParticles ) {
-                        var particle = new Particle( mesh );
-                        app.swarmObject3D.add( particle.anchor );
-                        particles.push( particle );
-                        setTimeout( createMore, W.map( particles.length / maxParticles, 0, 1, maxCreationTimeMS, minCreationTime, W.interpolations.easeIn ) );
-                    }
-                }());
-            }
-
             // Updating
             addPreRenderFn( app, function ( deltaMS, timestampMS ) {
                 particles.forEach( particle => particle.update( deltaMS, timestampMS ) );
@@ -262,6 +288,8 @@ var PunterViz = (function () {
                 side: THREE.DoubleSide
             });
 
+            console.log( 'Set material to', Particle.material );
+
             Particle.initialScale = 200;
 
             // ### Method
@@ -270,6 +298,34 @@ var PunterViz = (function () {
                 this.anchor.rotation.y += this.velocity / 10;
                 this.anchor.rotation.z += 0.001;
             };
+
+            // Loader
+            // ------
+            var loader = new THREE.OBJLoader();
+            loader.load( '/obj/pillow-box.obj', onObjLoaded );
+
+            // Swarm Creation
+            // ----------------
+            function onObjLoaded ( obj ) {
+
+                var mesh = obj.children[ 0 ];
+
+                // Particle Creation
+                // -----------------
+                // Ease in the creation of the particles
+                var maxParticles = 100;
+                var minCreationTime = 5;
+                var maxCreationTimeMS = 100;
+                
+                (function createMore () {
+                    if ( particles.length < maxParticles ) {
+                        var particle = new Particle( mesh );
+                        app.swarmObject3D.add( particle.anchor );
+                        particles.push( particle );
+                        setTimeout( createMore, W.map( particles.length / maxParticles, 0, 1, maxCreationTimeMS, minCreationTime, W.interpolations.easeIn ) );
+                    }
+                }());
+            }
             
             resolve( app );
         });
