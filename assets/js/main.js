@@ -83,7 +83,7 @@ function makePunterVizs ( app ) {
             .toArray()
             .map( function ( el ) {
                 // Make the punter application
-                app.punterViz = PunterViz.makeApp();
+                app.punterViz = PunterViz.makeViz();
                 // Add out dom element
                 app.punterViz.containerEl = el;
 
@@ -92,7 +92,7 @@ function makePunterVizs ( app ) {
                 var FORWARDS_HIGH = [ [ '/' ] ] 
                 
                 PunterViz
-                    .initApp( app.punterViz )
+                    .initViz( app.punterViz )
                     .error( function ( err ) {
                         console.error( 'Failed to create Punter app', err );
                     }) 

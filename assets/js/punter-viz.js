@@ -10,7 +10,7 @@ var PunterViz = (function () {
 
     // Init & make
     // ===========
-    function makeApp () {
+    function makeViz () {
         return {
             containerEl: document.createElement( 'div' ),
             backroundColor: 0x616264,
@@ -20,7 +20,7 @@ var PunterViz = (function () {
         };
     }
 
-    var initApp = W.composePromisers( makeCameraSceneRenderer,
+    var initViz = W.composePromisers( makeCameraSceneRenderer,
                                       makeWebCamTexture,
                                       makeWebCamMaterial,
                                       makeCubeCam,
@@ -35,36 +35,36 @@ var PunterViz = (function () {
 
     // Camera, Scene, Renderer
     // -----------------------
-    function makeCameraSceneRenderer ( app ) {
+    function makeCameraSceneRenderer ( viz ) {
         return W.promise( function ( resolve, reject ) {
             
             // Camera
             // ------
-            app.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
-            setCameraPosition( app, 0, 0, 200 );
+            viz.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
+            setCameraPosition( viz, 0, 0, 200 );
 
             // Scene
             // -----
-            app.scene = new THREE.Scene();
+            viz.scene = new THREE.Scene();
 
             // Renderer
             // --------
-            app.renderer = new THREE.WebGLRenderer( { antialias: false } );
-	    app.renderer.setPixelRatio( window.devicePixelRatio );
-	    app.renderer.setSize( window.innerWidth, window.innerHeight );
-            app.renderer.setClearColor( app.backgroundColor );
-	    app.renderer.sortObjects = false;
+            viz.renderer = new THREE.WebGLRenderer( { antialias: false } );
+            viz.renderer.setPixelRatio( window.devicePixelRatio );
+            viz.renderer.setSize( window.innerWidth, window.innerHeight );
+            viz.renderer.setClearColor( viz.backgroundColor );
+            viz.renderer.sortObjects = false;
 
-            app.containerEl.appendChild( app.renderer.domElement );
+            viz.containerEl.appendChild( viz.renderer.domElement );
             
-            resolve( app );
+            resolve( viz );
         });
     }
 
     // Web Cam
     // -------
     // Make the web cam available as a texture
-    function makeWebCamTexture ( app ) {
+    function makeWebCamTexture ( viz ) {
         return W.promise( function ( resolve, reject ) {
 
             // Web Cam DOM Element
@@ -82,18 +82,18 @@ var PunterViz = (function () {
 
             // Web Cam Texture
             // ---------------
-            app.webCamTexture = new THREE.Texture( webCamEl );
-            app.webCamTexture.minFilter = THREE.LinearFilter;
+            viz.webCamTexture = new THREE.Texture( webCamEl );
+            viz.webCamTexture.minFilter = THREE.LinearFilter;
             
             // Render Updates
             // --------------
-            addPreRenderFn( app, function ( detlaMS, timestampMS ) {
+            addPreRenderFn( viz, function ( detlaMS, timestampMS ) {
                 if( webCamEl.readyState === webCamEl.HAVE_ENOUGH_DATA ){
-                    app.webCamTexture.needsUpdate = true;
+                    viz.webCamTexture.needsUpdate = true;
                 }
             });
             
-            resolve( app );
+            resolve( viz );
         });
     }
 
@@ -101,36 +101,36 @@ var PunterViz = (function () {
     // -----------
     // Create a cube cam for a dynamic envMap.
     // This also enables two hooks: `preCubeCamRenderActions` & `postCubeCamRenderActions`
-    // in the app for that object3D in the scene can be turned on and off during
+    // in the viz for that object3D in the scene can be turned on and off during
     // the webcams render
-    function makeCubeCam ( app ) { 
+    function makeCubeCam ( viz ) { 
         return W.promise( function ( resolve, reject ) {
 
-            app.cubeCamera = new THREE.CubeCamera(1, 3000, 256); // near, far, resolution
-            app.cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter; // mipmap filter
+            viz.cubeCamera = new THREE.CubeCamera(1, 3000, 256); // near, far, resolution
+            viz.cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter; // mipmap filter
             
-            addPreRenderFn( app, function ( deltaMS, timestampMS ) {    
+            addPreRenderFn( viz, function ( deltaMS, timestampMS ) {    
                 // Render the cube camera to cube map
                 // ----------------------------------
-                app.preCubeCamRenderFns.forEach( fn => fn( deltaMS, timestampMS ) );
-                app.cubeCamera.updateCubeMap( app.renderer, app.scene );
-                app.postCubeCamRenderFns.forEach( fn => fn( deltaMS, timestampMS ) );
+                viz.preCubeCamRenderFns.forEach( fn => fn( deltaMS, timestampMS ) );
+                viz.cubeCamera.updateCubeMap( viz.renderer, viz.scene );
+                viz.postCubeCamRenderFns.forEach( fn => fn( deltaMS, timestampMS ) );
             });
             
-            resolve( app );
+            resolve( viz );
         });
     }
 
     // Web Cam Material
     // ----------------
-    function makeWebCamMaterial ( app ) {
+    function makeWebCamMaterial ( viz ) {
         return W.promise( function ( resolve, reject ) {
-            app.webCamMaterial = new THREE.MeshBasicMaterial({
-                map: app.webCamTexture,
+            viz.webCamMaterial = new THREE.MeshBasicMaterial({
+                map: viz.webCamTexture,
                 color: 0xffffff,
-	        side: THREE.DoubleSide
+                side: THREE.DoubleSide
             });
-            resolve( app );
+            resolve( viz );
         });
 
     }
@@ -139,40 +139,40 @@ var PunterViz = (function () {
     // ----------------
     // Creates a box with the web cam displayed
     // on the inside of each of it's 6 sides
-    function makeWebCamBoxMesh ( app ) {
+    function makeWebCamBoxMesh ( viz ) {
         return W.promise( function ( resolve, reject ) {
             
-            app.webCamvBoxMesh = new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), app.webCamMaterial );
+            viz.webCamvBoxMesh = new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), viz.webCamMaterial );
 
             var rotationX = W.randomBetween( 0.0002, 0.00002 );
             var rotationY = W.randomBetween( 0.0002, 0.00002 );
             var rotationZ = W.randomBetween( 0.0002, 0.00002 );
             
             // If we want to rotate it
-            addPreRenderFn( app, function ( deltaMS, timestampMS ) {
-                app.webCamvBoxMesh.rotation.x += ( deltaMS * rotationX );
-                app.webCamvBoxMesh.rotation.y += ( deltaMS * rotationY );
-                app.webCamvBoxMesh.rotation.z += ( deltaMS * rotationZ );
+            addPreRenderFn( viz, function ( deltaMS, timestampMS ) {
+                viz.webCamvBoxMesh.rotation.x += ( deltaMS * rotationX );
+                viz.webCamvBoxMesh.rotation.y += ( deltaMS * rotationY );
+                viz.webCamvBoxMesh.rotation.z += ( deltaMS * rotationZ );
             });
             
-	    app.scene.add( app.webCamvBoxMesh );
+            viz.scene.add( viz.webCamvBoxMesh );
 
             // Show it only for the cube cam
-            app.preCubeCamRenderFns.push( function () {
-                app.webCamvBoxMesh.visible = true;
+            viz.preCubeCamRenderFns.push( function () {
+                viz.webCamvBoxMesh.visible = true;
             });
 
-            app.postCubeCamRenderFns.push( function () {
-                app.webCamvBoxMesh.visible = true;
+            viz.postCubeCamRenderFns.push( function () {
+                viz.webCamvBoxMesh.visible = true;
             });
 
-            resolve( app );
+            resolve( viz );
         });
     }
 
     // Web Cam Hedron Mesh
     // -------------------
-    function makeWebCamHedronMesh ( app ) {
+    function makeWebCamHedronMesh ( viz ) {
         return W.promise( function ( resolve, reject ) {
 
             // Loader
@@ -184,34 +184,37 @@ var PunterViz = (function () {
             // ----------------
             function onObjLoaded ( obj ) {
                 console.log( obj.children[ 0 ] );
-                app.webCamHedronMesh = obj.children[ 0 ].clone(); //new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), material );
-                app.webCamHedronMesh.material = app.webCamMaterial;
+                viz.webCamHedronMesh = obj.children[ 0 ].clone(); //new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), material );
+                viz.webCamHedronMesh.material = viz.webCamMaterial.clone();
+                
                 var scale = 2800;
-                app.webCamHedronMesh.scale.set( scale, scale, scale );
+                viz.webCamHedronMesh.scale.set( scale, scale, scale );
 
                 var rotationX = W.randomBetween( 0.0002, 0.00002 );
                 var rotationY = W.randomBetween( 0.0002, 0.00002 );
                 var rotationZ = W.randomBetween( 0.0002, 0.00002 );
                 
                 // If we want to rotate it
-                addPreRenderFn( app, function ( deltaMS, timestampMS ) {
-                    app.webCamHedronMesh.rotation.x += ( deltaMS * rotationX );
-                    app.webCamHedronMesh.rotation.y += ( deltaMS * rotationY );
-                    app.webCamHedronMesh.rotation.z += ( deltaMS * rotationZ );
+                addPreRenderFn( viz, function ( deltaMS, timestampMS ) {
+                    viz.webCamHedronMesh.rotation.x += ( deltaMS * rotationX );
+                    viz.webCamHedronMesh.rotation.y += ( deltaMS * rotationY );
+                    viz.webCamHedronMesh.rotation.z += ( deltaMS * rotationZ );
                 });
                 
-	        app.scene.add( app.webCamHedronMesh );
+                viz.scene.add( viz.webCamHedronMesh );
 
                 // Show it only for the cube cam
-                app.preCubeCamRenderFns.push( function () {
-                    app.webCamHedronMesh.visible = true;
+                viz.preCubeCamRenderFns.push( function () {
+                    viz.webCamHedronMesh.visible = true;
+                    viz.webCamHedronMesh.material.color.set( 0xffffff );
                 });
 
-                app.postCubeCamRenderFns.push( function () {
-                    app.webCamHedronMesh.visible = true;
+                viz.postCubeCamRenderFns.push( function () {
+                    viz.webCamHedronMesh.visible = true;
+                    viz.webCamHedronMesh.material.color.set( 0xd9d5b3 );
                 });
 
-                resolve( app );
+                resolve( viz );
             }
             
         });
@@ -219,41 +222,41 @@ var PunterViz = (function () {
 
     // Lights
     // ------
-    function makeLights ( app ) {
+    function makeLights ( viz ) {
         return W.promise( function ( resolve, reject ) {
-            app.scene.add( new THREE.AmbientLight( 0x222222 ) );
+            viz.scene.add( new THREE.AmbientLight( 0x222222 ) );
 
             var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-	    directionalLight.position.set( 2, 1.2, 10 ).normalize();
-	    app.scene.add( directionalLight );
+            directionalLight.position.set( 2, 1.2, 10 ).normalize();
+            viz.scene.add( directionalLight );
 
-	    directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-	    directionalLight.position.set( -2, 1.2, -10 ).normalize();
-	    app.scene.add( directionalLight );  
-            resolve( app );
+            directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+            directionalLight.position.set( -2, 1.2, -10 ).normalize();
+            viz.scene.add( directionalLight );  
+            resolve( viz );
         });
     }
 
     // Swarm
     // -----
-    function makeSwarm ( app ) {
+    function makeSwarm ( viz ) {
         return W.promise( function ( resolve, reject ) {
             
             var particles = [];
 
             // Add to Scene
             // ------------
-            app.swarmObject3D = new THREE.Object3D();
-            app.scene.add( app.swarmObject3D );
-            app.preCubeCamRenderFns.push( function () {
-                app.swarmObject3D.visible = false;
+            viz.swarmObject3D = new THREE.Object3D();
+            viz.scene.add( viz.swarmObject3D );
+            viz.preCubeCamRenderFns.push( function () {
+                viz.swarmObject3D.visible = false;
             });
-            app.postCubeCamRenderFns.push( function () {
-                app.swarmObject3D.visible = true;
+            viz.postCubeCamRenderFns.push( function () {
+                viz.swarmObject3D.visible = true;
             });
 
             // Updating
-            addPreRenderFn( app, function ( deltaMS, timestampMS ) {
+            addPreRenderFn( viz, function ( deltaMS, timestampMS ) {
                 particles.forEach( particle => particle.update( deltaMS, timestampMS ) );
             });
 
@@ -273,22 +276,20 @@ var PunterViz = (function () {
                 // Position
                 var range = 100;
                 this.mesh.position.set( ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range );
-                                
+                
                 this.anchor = new THREE.Object3D();
                 this.anchor.add( this.mesh );
             }
 
             // ### Static
             Particle.material = new THREE.MeshPhongMaterial( {
-		color: 0xffffff,
-		shininess: 0.0,
-		specular: 0xffffff,
-		envMap: app.cubeCamera.renderTarget,
+                color: 0xffffff,
+                shininess: 0.0,
+                specular: 0xffffff,
+                envMap: viz.cubeCamera.renderTarget,
                 reflectivity: 1.0,
                 side: THREE.DoubleSide
             });
-
-            console.log( 'Set material to', Particle.material );
 
             Particle.initialScale = 200;
 
@@ -320,20 +321,20 @@ var PunterViz = (function () {
                 (function createMore () {
                     if ( particles.length < maxParticles ) {
                         var particle = new Particle( mesh );
-                        app.swarmObject3D.add( particle.anchor );
+                        viz.swarmObject3D.add( particle.anchor );
                         particles.push( particle );
                         setTimeout( createMore, W.map( particles.length / maxParticles, 0, 1, maxCreationTimeMS, minCreationTime, W.interpolations.easeIn ) );
                     }
                 }());
             }
             
-            resolve( app );
+            resolve( viz );
         });
     }
 
     // Render Loop
     // -----------
-    function makeRenderLoop ( app ) {
+    function makeRenderLoop ( viz ) {
         return W.promise( function ( resolve, reject ) {
 
             var lastTimestampMS = 0;
@@ -352,16 +353,16 @@ var PunterViz = (function () {
                 
                 // Actionables
                 // -----------
-                app.preRenderFns.forEach( fn => fn( deltaMS, currentTimestampMS ) );
+                viz.preRenderFns.forEach( fn => fn( deltaMS, currentTimestampMS ) );
                 
                 // Render
                 // ------
-                app.renderer.clear();
-		app.renderer.render( app.scene, app.camera );
+                viz.renderer.clear();
+                viz.renderer.render( viz.scene, viz.camera );
 
             }( lastTimestampMS ));
             
-            resolve( app );
+            resolve( viz );
         });
 
     }
@@ -371,23 +372,30 @@ var PunterViz = (function () {
 
     // Render Loop
     // -----------
-    function addPreRenderFn ( app, fn ) {
-        app.preRenderFns.push( fn );
+    function addPreRenderFn ( viz, fn ) {
+        viz.preRenderFns.push( fn );
+        return viz;
     }
 
     // Camera
     // ------
-    function setCameraPosition ( app, x, y, z ) {
-        app.camera.position.x = x;
-        app.camera.position.y = y;
-        app.camera.position.z = z;
+    function setCameraPosition ( viz, x, y, z ) {
+        viz.camera.position.x = x;
+        viz.camera.position.y = y;
+        viz.camera.position.z = z;
+        return viz;
     }
- 
+
+    function setVelocity ( viz, value ) {
+        return viz;
+    }
+    
     // Export
     // ======    
     return {
-        makeApp: makeApp,
-        initApp: initApp  
+        makeViz: makeViz,
+        initViz: initViz,
+        setVelocity: setVelocity
     };
     
 }());
