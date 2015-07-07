@@ -96,9 +96,36 @@ function makePunterVizs ( app ) {
                     .error( function ( err ) {
                         console.error( 'Failed to create Punter app', err );
                     }) 
-                    .success( function ( initalisedPunterApp ) {
-                        console.log( 'Punter application made' );
+                    .success( function ( viz ) {
 
+                        // Device Rotation
+                        // ===============
+
+                        // Non-Mobile / Debug
+                        // ------------------
+                        if ( window.location.search.indexOf( 'debug') > -1 ) {
+
+                            // Make
+                            var rangeEl = document.createElement( 'input' );
+                            rangeEl.setAttribute( 'type', 'range' );
+                            rangeEl.setAttribute( 'min', -1 );
+                            rangeEl.setAttribute( 'max', 1 );
+                            rangeEl.setAttribute( 'step', 0.01 );
+                            rangeEl.setAttribute( 'value', 0.25 );
+                            rangeEl.setAttribute( 'style', 'position: absolute' );
+
+                            $( rangeEl )
+                                .asEventStream( 'change' )
+                                .map( event => event.currentTarget )
+                                .map( el => $( el ).val() )
+                                .onValue( v => PunterViz.setVelocity( viz, null, v, null ) );
+
+                            $( '#punter' ).prepend( rangeEl );
+                            
+                        }
+                        
+                        // Mobile
+                        // ------
                         var rotationStep = 25.714285714;
 
                         // Add the rotation controls
@@ -138,6 +165,9 @@ function makePunterVizs ( app ) {
                                     RestesqueUtil.post( app.wsClient, '/motor/rotation/speed/', speed );
                                 }
                             });
+                        
+                        console.log( 'Punter application made' );
+                        
                     });
             });
         resolve( app );

@@ -14,6 +14,7 @@ var PunterViz = (function () {
         return {
             containerEl: document.createElement( 'div' ),
             backroundColor: 0x616264,
+            velocity: [ 0, 0, 0 ],
             preRenderFns: [],
             preCubeCamRenderFns: [],
             postCubeCamRenderFns: []
@@ -295,9 +296,12 @@ var PunterViz = (function () {
 
             // ### Method
             Particle.prototype.update = function ( deltaMS, timestampMS ) {
-                this.anchor.rotation.x += 0.002;
-                this.anchor.rotation.y += this.velocity / 10;
-                this.anchor.rotation.z += 0.001;
+                this.anchor.rotation.x += viz.velocity[ 0 ] / 10;
+                this.anchor.rotation.y += viz.velocity[ 1 ] / 10;
+                this.anchor.rotation.z += viz.velocity[ 2 ] / 10;
+                this.mesh.rotation.x += 0.002;
+                this.mesh.rotation.y += 0.001;
+                this.mesh.rotation.z += 0.003;
             };
 
             // Loader
@@ -386,7 +390,10 @@ var PunterViz = (function () {
         return viz;
     }
 
-    function setVelocity ( viz, value ) {
+    function setVelocity ( viz, x, y, z ) {
+        if ( W.isDefined( x ) && x !== null ) { viz.velocity[ 0 ] = x; }
+        if ( W.isDefined( y ) && y !== null ) { viz.velocity[ 1 ] = y; }
+        if ( W.isDefined( z ) && z !== null ) { viz.velocity[ 2 ] = z; }
         return viz;
     }
     
