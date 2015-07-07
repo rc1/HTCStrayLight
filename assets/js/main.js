@@ -16,6 +16,8 @@ var makeApp = function () {
 };
 
 var initApp = W.composePromisers( makeWebSocketClient,
+                                  subscribeToHostControlMode,
+                                  addPunterCid,
                                   makePunterVizs,
                                   makeRestRadioButtons );
 
@@ -48,7 +50,27 @@ function makeWebSocketClient ( app ) {
         app.wsClient.on( 'error', makeReporter( 'Web Socket Error' ) );
         app.wsClient.on( 'close', makeReporter( 'Web Socket Close' ) );
         app.wsClient.openSocketConnection();
-        
+    });
+}
+
+function subscribeToHostControlMode ( app ) {
+    return W.promise( function ( resolve, reject ) {
+        app.controlMode = '';
+        RestesqueUtil
+            .subscribeWithInitialGet( app.wsClient, '/host/control/mode/', function ( packet ) {
+                app.controlMode = packet.getBody();
+                console.log( 'Control Mode Change to:', app.controlMode );
+            })
+            .success( function () {
+                resolve( app );
+            });
+    });
+}
+
+function addPunterCid ( app ) {
+    return W.promise( function ( resolve, reject ) {
+        app.punterCid = $( '[data-punter-cid]' ).data( 'punterCid' );
+        resolve( app );
     });
 }
 
@@ -97,7 +119,9 @@ function makePunterVizs ( app ) {
                             .skipDuplicates()
                             .throttle( 100 )
                             .onValue( function ( direction ) {
-                                RestesqueUtil.post( app.wsClient, '/motor/rotation/direction/', direction );
+                                if ( 'phone-' + app.punterCid === app.controlMode ) {
+                                    RestesqueUtil.post( app.wsClient, '/motor/rotation/direction/', direction );
+                                }
                             });
 
                         // Speed
@@ -110,7 +134,9 @@ function makePunterVizs ( app ) {
                             })
                             .throttle( 100 )
                             .onValue( function ( speed ) {
-                                RestesqueUtil.post( app.wsClient, '/motor/rotation/speed/', speed );
+                                if ( 'phone-' + app.punterCid === app.controlMode ) {
+                                    RestesqueUtil.post( app.wsClient, '/motor/rotation/speed/', speed );
+                                }
                             });
                     });
             });
