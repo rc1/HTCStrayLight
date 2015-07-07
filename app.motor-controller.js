@@ -85,7 +85,7 @@ function doPostMotorDirectionToNone ( app ) {
 function subscribeToIsEnabled ( app ) {
     return W.promise( function ( resolve, reject ) {
         RestesqueUtil.subscribeWithInitialGet( app.wsClient, '/motor/controller/is-enabled/', function ( packet ) {
-            MotorInterface.doSetEnabled( app.MotorInterface,  packet.getBody() === 'yes' ? true : false );
+            MotorInterface.doSetEnabled( app.motorInterface,  packet.getBody() === 'yes' ? true : false );
         }).success( W.partial( resolve, app ) );
     });
 }
