@@ -212,7 +212,7 @@ var PunterViz = (function () {
 
                 viz.postCubeCamRenderFns.push( function () {
                     viz.webCamHedronMesh.visible = true;
-                    viz.webCamHedronMesh.material.color.set( 0xd9d5b3 );
+                    viz.webCamHedronMesh.material.color.set( 0x6d6841 );
                 });
 
                 resolve( viz );
@@ -265,21 +265,40 @@ var PunterViz = (function () {
             // --------------
             function Particle ( mesh ) {
 
-                this.velocity = W.randomBetween( 0.2, 1 );
+                this.velocity = [ 0, 0, 0 ];
+                this.actualVelocity = [ 0, 0, 0 ];
+
+                // ### Positioning
+                this.positionScalar = W.interpolations.cubicEaseOut( Math.random() );
+               
+                var scale = Particle.initialScale * W.map( this.positionScalar, 0, 1, 0.4, 1 );
 
                 // Mesh
                 this.mesh = mesh.clone();
-                this.mesh.material = Particle.material.clone();
-                this.mesh.scale.x = Particle.initialScale;
-                this.mesh.scale.y = Particle.initialScale;
-                this.mesh.scale.z = Particle.initialScale;
-
-                // Position
-                var range = 100;
-                this.mesh.position.set( ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range );
-                
                 this.anchor = new THREE.Object3D();
                 this.anchor.add( this.mesh );
+                this.mesh.material = Particle.material.clone();
+                this.mesh.scale.x = scale;
+                this.mesh.scale.y = scale;
+                this.mesh.scale.z = scale;
+
+                var rangeMaxX = 60;
+
+                this.mesh.position.set( rangeMaxX * (1 - this.positionScalar), W.randomBetween( -50, 50 ), 0 );
+                
+                //this.mesh.position.set( rangeMax * positionScalar, 0, 0 );
+
+                this.mesh.rotation.x = W.randomBetween( -180, 180 );
+                this.mesh.rotation.y = W.randomBetween( -180, 180 );
+                this.mesh.rotation.z = W.randomBetween( -180, 180 );
+
+                this.anchor.rotation.y +=  W.randomBetween( -180, 180 );
+
+                
+                // var range = 100;
+                // this.mesh.position.set( ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range );
+                
+                
             }
 
             // ### Static
@@ -292,13 +311,13 @@ var PunterViz = (function () {
                 side: THREE.DoubleSide
             });
 
-            Particle.initialScale = 200;
+            Particle.initialScale = 300;
 
             // ### Method
             Particle.prototype.update = function ( deltaMS, timestampMS ) {
-                this.anchor.rotation.x += viz.velocity[ 0 ] / 10;
-                this.anchor.rotation.y += viz.velocity[ 1 ] / 10;
-                this.anchor.rotation.z += viz.velocity[ 2 ] / 10;
+                this.anchor.rotation.x += this.velocity[ 0 ] * ( 1 - this.positionScalar ) * 0.4;
+                this.anchor.rotation.y += this.velocity[ 1 ] * ( 1 - this.positionScalar ) * 0.4;
+                this.anchor.rotation.z += this.velocity[ 2 ] * ( 1 - this.positionScalar ) * 0.4;
                 this.mesh.rotation.x += 0.002;
                 this.mesh.rotation.y += 0.001;
                 this.mesh.rotation.z += 0.003;
@@ -320,7 +339,7 @@ var PunterViz = (function () {
                 // Ease in the creation of the particles
                 var maxParticles = 100;
                 var minCreationTime = 5;
-                var maxCreationTimeMS = 100;
+                var maxCreationTimeMS = 20;
                 
                 (function createMore () {
                     if ( particles.length < maxParticles ) {

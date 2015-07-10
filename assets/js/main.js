@@ -89,7 +89,7 @@ function makePunterVizs ( app ) {
 
                 // Initailise it
 
-                var FORWARDS_HIGH = [ [ '/' ] ] 
+                var FORWARDS_HIGH = [ [ '/' ] ];
                 
                 PunterViz
                     .initViz( app.punterViz )
@@ -130,9 +130,20 @@ function makePunterVizs ( app ) {
 
                         // Add the rotation controls
                         // gamma right 90, left -90
-                        var gammaStream = $( window )
+                        var orientationStream =  $( window )
                                 .asEventStream( 'deviceorientation' )
-                                .map( e => e.originalEvent.gamma );
+                                .map( e => [ e.originalEvent.gamma, e.originalEvent.alpha, e.originalEvent.beta ] );
+
+                        var gammaStream = orientationStream
+                            .map( arr => arr[ 1 ] );
+
+                        orientationStream
+                            .throttle( 300 )
+                            .onValue( arr => PunterViz.setVelocity( viz, null,  W.map( arr[0], -180, 180, -3, 3, true ), null ) );
+
+                        // orientationStream
+                        //     .onValue( arr => viz.camera.rotation.z = arr[ 1 ] );
+                        
 
                         // [ bh, bm, bl, n, fl, fm, fh ]
                         
