@@ -135,11 +135,11 @@ function makePunterVizs ( app ) {
                                 .map( e => [ e.originalEvent.gamma, e.originalEvent.alpha, e.originalEvent.beta ] );
 
                         var gammaStream = orientationStream
-                            .map( arr => arr[ 1 ] );
+                            .map( arr => arr[ 0 ] );
 
                         orientationStream
-                            .throttle( 300 )
-                            .onValue( arr => PunterViz.setVelocity( viz, null,  W.map( arr[0], -180, 180, -3, 3, true ), null ) );
+                            .throttle( 100 )
+                            .onValue( arr => PunterViz.setVelocity( viz, null, W.map( arr[0], -180, 180, -1, 1, true ), null ) );
 
                         // orientationStream
                         //     .onValue( arr => viz.camera.rotation.z = arr[ 1 ] );

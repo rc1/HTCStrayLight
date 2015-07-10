@@ -265,9 +265,6 @@ var PunterViz = (function () {
             // --------------
             function Particle ( mesh ) {
 
-                this.velocity = [ 0, 0, 0 ];
-                this.actualVelocity = [ 0, 0, 0 ];
-
                 // ### Positioning
                 this.positionScalar = W.interpolations.cubicEaseOut( Math.random() );
                
@@ -315,9 +312,9 @@ var PunterViz = (function () {
 
             // ### Method
             Particle.prototype.update = function ( deltaMS, timestampMS ) {
-                this.anchor.rotation.x += this.velocity[ 0 ] * ( 1 - this.positionScalar ) * 0.4;
-                this.anchor.rotation.y += this.velocity[ 1 ] * ( 1 - this.positionScalar ) * 0.4;
-                this.anchor.rotation.z += this.velocity[ 2 ] * ( 1 - this.positionScalar ) * 0.4;
+                this.anchor.rotation.x += viz.velocity[ 0 ] * ( 1 - this.positionScalar ) * 0.4;
+                this.anchor.rotation.y += viz.velocity[ 1 ] * ( 1 - this.positionScalar ) * 0.4;
+                this.anchor.rotation.z += viz.velocity[ 2 ] * ( 1 - this.positionScalar ) * 0.4;
                 this.mesh.rotation.x += 0.002;
                 this.mesh.rotation.y += 0.001;
                 this.mesh.rotation.z += 0.003;
