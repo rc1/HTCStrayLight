@@ -21,18 +21,22 @@ var makeApp = function () {
 
 var initApp = W.composePromisers( makeMotorInterface,
                                   // doRunMotorInterfaceTestSequence,
-                                  makeWebSocketClient,
+                                  makeWebSocketClient(
+                                      subscribeToIsEnabled,
+                                      subscribeRotationDirection,
+                                      subscribeRotationSpeed
+                                  ),
                                   doStartPostingHeartBeats,
-                                  doPostMotorDirectionToNone,
-                                  subscribeToIsEnabled,
-                                  subscribeRotationDirection,
-                                  subscribeRotationSpeed );
+                                  doPostMotorDirectionToNone
+                                );
 
 initApp( makeApp() )
     .success( function ( app ) {
         report( 'OK', 'Application created' );
-    });
 
+        
+        
+    });
 
 // Promisers
 // =========
@@ -56,24 +60,32 @@ function doRunMotorInterfaceTestSequence ( app ) {
     });
 }
 
-function makeWebSocketClient ( app ) {
-    return W.promise( function ( resolve, reject ) {
-        var socketUrl = 'wss://localhost:' + app.wsPort + '/';
-        report( 'CONNECTING', 'attempting to connect to:', socketUrl );
+// Takes a sequence of promiser to connect upon a successful reconnection.
+// Even after a reconnect.
+function makeWebSocketClient ( onConnectPromisers ) {
+    onConnectPromisers = W.toArray( arguments );
+    return function ( app ) {
+        return W.promise( function ( resolve, reject ) {
+            var socketUrl = 'wss://localhost:' + app.wsPort + '/';
+            report( 'CONNECTING', 'attempting to connect to:', socketUrl );
 
-        app.wsClient = new JSONSocketConnection( {
-            socketUrl: socketUrl
+            app.wsClient = new JSONSocketConnection( {
+                socketUrl: socketUrl
+            });
+
+            var resolveOnFirstConnect = once( function () {
+                report( 'CONNECTED', 'to:', socketUrl );
+                resolve( app );
+            });
+
+            app.wsClient.on( 'open', resolveOnFirstConnect );
+            app.wsClient.on( 'open', function () {
+                W.composePromisers.apply( this, onConnectPromisers )( app ); 
+            });
+            app.wsClient.on( 'error', makeReporter( 'Web Socket Error' ) );
+            app.wsClient.openSocketConnection();
         });
-
-        var resolveOnFirstConnect = once( function () {
-            report( 'CONNECTED', 'to:', socketUrl );
-            resolve( app );
-        });
-
-        app.wsClient.on( 'open', resolveOnFirstConnect );
-        app.wsClient.on( 'error', makeReporter( 'Web Socket Error' ) );
-        app.wsClient.openSocketConnection();
-    });
+    }
 }
 
 function doPostMotorDirectionToNone ( app ) {
@@ -88,6 +100,7 @@ function subscribeToIsEnabled ( app ) {
             MotorInterface.doSetEnabled( app.motorInterface,  packet.getBody() === 'yes' ? true : false );
         }).success( W.partial( resolve, app ) );
     });
+
 }
 
 
