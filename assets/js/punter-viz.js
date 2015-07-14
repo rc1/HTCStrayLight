@@ -17,11 +17,13 @@ var PunterViz = (function () {
             velocity: [ 0, 0, 0 ],
             preRenderFns: [],
             preCubeCamRenderFns: [],
-            postCubeCamRenderFns: []
+            postCubeCamRenderFns: [],
+            wsClient: undefined
         };
     }
 
-    var initViz = W.composePromisers( makeCameraSceneRenderer,
+    var initViz = W.composePromisers( subscribeToHostControlMode,
+                                      makeCameraSceneRenderer,
                                       makeWebCamTexture,
                                       makeWebCamMaterial,
                                       makeCubeCam,
@@ -33,6 +35,27 @@ var PunterViz = (function () {
 
     // Promisers
     // =========
+
+    // Restesque
+    // ---------
+    function subscribeToHostControlMode ( viz ) {
+        return W.promise( function ( resolve, reject ) {
+            viz.controlMode = '';
+
+            subscribe();
+            viz.wsClient.on( 'open', subscribe );
+
+            function subscribe () {
+                RestesqueUtil
+                    .subscribeWithInitialGet( app.wsClient, '/host/control/mode/', function ( packet ) {
+                        app.controlMode = packet.getBody();
+                        console.log( 'Control Mode Change to:', app.controlMode );
+                    });
+            }
+
+            resolve( viz );
+        });
+    }
 
     // Camera, Scene, Renderer
     // -----------------------

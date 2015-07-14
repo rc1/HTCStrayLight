@@ -16,7 +16,6 @@ var makeApp = function () {
 };
 
 var initApp = W.composePromisers( makeWebSocketClient,
-                                  subscribeToHostControlMode,
                                   addPunterCid,
                                   makePunterVizs,
                                   makeRestRadioButtons );
@@ -53,20 +52,6 @@ function makeWebSocketClient ( app ) {
     });
 }
 
-function subscribeToHostControlMode ( app ) {
-    return W.promise( function ( resolve, reject ) {
-        app.controlMode = '';
-        RestesqueUtil
-            .subscribeWithInitialGet( app.wsClient, '/host/control/mode/', function ( packet ) {
-                app.controlMode = packet.getBody();
-                console.log( 'Control Mode Change to:', app.controlMode );
-            })
-            .success( function () {
-                resolve( app );
-            });
-    });
-}
-
 function addPunterCid ( app ) {
     return W.promise( function ( resolve, reject ) {
         app.punterCid = $( '[data-punter-cid]' ).data( 'punterCid' );
@@ -86,6 +71,8 @@ function makePunterVizs ( app ) {
                 app.punterViz = PunterViz.makeViz();
                 // Add out dom element
                 app.punterViz.containerEl = el;
+                // WebSockets
+                app.punterViz.wsClient = app.wsClient;
 
                 // Initailise it
 
@@ -215,19 +202,28 @@ function makeRestRadioButtons ( app ) {
 
                 var radioEls = $el.find( 'input[type="radio"]' ).checkboxradio();
                 
-                console.log(  'got a field set', $el.data( 'restUri' ) );
-                RestesqueUtil.subscribeWithInitialGet( app.wsClient, $el.data( 'restUri' ), function ( packet ) {
-                    radioEls
-                        .prop( 'checked', false )
-                        .checkboxradio( 'refresh' )
-                        .filter( 'input[value="'+ packet.getBody() +'"]' )
-                        .attr( 'checked', 'checked' )
-                        .checkboxradio( 'refresh' )
-                        .parent()
-                        .find( 'label' )
-                        .removeClass( 'ui-radio-off' )
-                        .addClass( 'ui-radio-on' );
+                console.log(  'Got a field set', $el.data( 'restUri' ) );
+
+                subscribeRadioFeildSet();
+                app.wsClient.on( 'open', function () {
+                    console.log( 'Subscribnig:',  $el.data( 'restUri' ) );
+                    subscribeRadioFeildSet();
                 });
+
+                function subscribeRadioFeildSet() {
+                    RestesqueUtil.subscribeWithInitialGet( app.wsClient, $el.data( 'restUri' ), function ( packet ) {
+                        radioEls
+                            .prop( 'checked', false )
+                            .checkboxradio( 'refresh' )
+                            .filter( 'input[value="'+ packet.getBody() +'"]' )
+                            .attr( 'checked', 'checked' )
+                            .checkboxradio( 'refresh' )
+                            .parent()
+                            .find( 'label' )
+                            .removeClass( 'ui-radio-off' )
+                            .addClass( 'ui-radio-on' );
+                    });
+                }
             });
         
         resolve( app );
