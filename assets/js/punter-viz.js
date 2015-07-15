@@ -81,6 +81,22 @@ var PunterViz = (function () {
             viz.renderer.sortObjects = false;
 
             viz.containerEl.appendChild( viz.renderer.domElement );
+
+            // Effects
+            // -------
+            viz.renderPass = new THREE.RenderPass( viz.scene, viz.camera );
+            viz.vignetteShader = new THREE.ShaderPass( THREE.VignetteShader );
+            viz.vignetteShader.uniforms.offset.value = 0.6;
+            viz.vignetteShader.uniforms.darkness.value = 2.1;
+
+            viz.effectCopy = new THREE.ShaderPass( THREE.CopyShader );
+            viz.effectCopy.renderToScreen = true;
+            
+            
+            viz.composer = new THREE.EffectComposer( viz.renderer );
+            viz.composer.addPass( viz.renderPass );
+            viz.composer.addPass( viz.vignetteShader );
+            viz.composer.addPass( viz.effectCopy );
             
             resolve( viz );
         });
@@ -203,7 +219,7 @@ var PunterViz = (function () {
             // Loader
             // ------
             var loader = new THREE.OBJLoader();
-            loader.load( '/obj/hedron.obj', onObjLoaded );
+            loader.load( '/obj/dodecahedron.obj', onObjLoaded );
 
             // Swarm Creation
             // ----------------
@@ -212,7 +228,7 @@ var PunterViz = (function () {
                 viz.webCamHedronMesh = obj.children[ 0 ].clone(); //new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), material );
                 viz.webCamHedronMesh.material = viz.webCamMaterial.clone();
                 
-                var scale = 2800;
+                var scale = 2000;
                 viz.webCamHedronMesh.scale.set( scale, scale, scale );
 
                 var rotationX = W.randomBetween( 0.0002, 0.00002 );
@@ -401,8 +417,9 @@ var PunterViz = (function () {
                 
                 // Render
                 // ------
-                viz.renderer.clear();
-                viz.renderer.render( viz.scene, viz.camera );
+                // viz.renderer.clear();
+                //viz.renderer.render( viz.scene, viz.camera );
+                viz.composer.render();
 
             }( lastTimestampMS ));
             
