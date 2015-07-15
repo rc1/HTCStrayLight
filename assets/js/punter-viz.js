@@ -15,6 +15,7 @@ var PunterViz = (function () {
             containerEl: document.createElement( 'div' ),
             backroundColor: 0x616264,
             velocity: [ 0, 0, 0 ],
+            deviceRotation: [ 0, 0, 0 ],
             preRenderFns: [],
             preCubeCamRenderFns: [],
             postCubeCamRenderFns: [],

@@ -124,6 +124,13 @@ function makePunterVizs ( app ) {
                         var gammaStream = orientationStream
                             .map( arr => arr[ 0 ] );
 
+                        // Update the background
+                        orientationStream
+                            .onValue( function ( arr  ) {
+                                console.log( 'updating', arr );
+                                viz.deviceRotation = arr;
+                            });
+
                         orientationStream
                             .throttle( 100 )
                             .onValue( arr => PunterViz.setVelocity( viz, null, W.map( arr[0], -180, 180, -1, 1, true ), null ) );

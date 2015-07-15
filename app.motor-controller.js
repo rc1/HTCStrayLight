@@ -2,6 +2,8 @@
 // =============
 // Client application to control the motors
 
+// Modules
+// =======
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 var W = require( 'w-js' );
