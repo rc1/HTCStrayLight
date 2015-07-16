@@ -144,8 +144,8 @@ function makePunterVizs ( app ) {
                         // Forwards & Backwards
                         gammaStream
                             .map( function ( g ) {
-                                if ( g < -rotationStep ) { return 'backward'; }
-                                else if ( g > rotationStep ) { return 'forward'; }
+                                if ( g < -rotationStep ) { return 'forward'; }
+                                else if ( g > rotationStep ) { return 'backward'; }
                                 else { return 'none'; } 
                             })
                             .skipDuplicates()
