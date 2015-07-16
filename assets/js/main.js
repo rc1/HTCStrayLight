@@ -133,7 +133,7 @@ function makePunterVizs ( app ) {
 
                         orientationStream
                             .throttle( 100 )
-                            .onValue( arr => PunterViz.setVelocity( viz, null, W.map( arr[0], -180, 180, -1, 1, true ), null ) );
+                            .onValue( arr => PunterViz.setVelocity( viz, null, W.map( arr[0], -180, 180, 1, -1, true ), null ) );
 
                         // orientationStream
                         //     .onValue( arr => viz.camera.rotation.z = arr[ 1 ] );
