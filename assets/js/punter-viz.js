@@ -19,7 +19,11 @@ var PunterViz = (function () {
             preRenderFns: [],
             preCubeCamRenderFns: [],
             postCubeCamRenderFns: [],
-            wsClient: undefined
+            wsClient: undefined,
+            height: 640,
+            width: 360,
+            swarmColor: new THREE.Color( 0xffffff ),
+            backgroundColor: new THREE.Color( 0xA5CF4C )
         };
     }
 
@@ -30,6 +34,7 @@ var PunterViz = (function () {
                                       makeCubeCam,
                                       // makeWebCamBoxMesh,
                                       makeWebCamHedronMesh,
+                                      makeBillboardBackground,
                                       makeSwarm,
                                       makeLights,
                                       makeRenderLoop );
@@ -65,7 +70,7 @@ var PunterViz = (function () {
             
             // Camera
             // ------
-            viz.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
+            viz.camera = new THREE.PerspectiveCamera( 70, viz.width / viz.height, 1, 30000 );
             setCameraPosition( viz, 0, 0, 200 );
 
             // Scene
@@ -76,27 +81,11 @@ var PunterViz = (function () {
             // --------
             viz.renderer = new THREE.WebGLRenderer( { antialias: false } );
             viz.renderer.setPixelRatio( window.devicePixelRatio );
-            viz.renderer.setSize( window.innerWidth, window.innerHeight );
+            viz.renderer.setSize( viz.width, viz.height );
             viz.renderer.setClearColor( viz.backgroundColor );
             viz.renderer.sortObjects = false;
 
             viz.containerEl.appendChild( viz.renderer.domElement );
-
-            // Effects
-            // -------
-            viz.renderPass = new THREE.RenderPass( viz.scene, viz.camera );
-            viz.vignetteShader = new THREE.ShaderPass( THREE.VignetteShader );
-            viz.vignetteShader.uniforms.offset.value = 0.6;
-            viz.vignetteShader.uniforms.darkness.value = 2.1;
-
-            viz.effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-            viz.effectCopy.renderToScreen = true;
-            
-            
-            viz.composer = new THREE.EffectComposer( viz.renderer );
-            viz.composer.addPass( viz.renderPass );
-            viz.composer.addPass( viz.vignetteShader );
-            viz.composer.addPass( viz.effectCopy );
             
             resolve( viz );
         });
@@ -107,8 +96,6 @@ var PunterViz = (function () {
     // Make the web cam available as a texture
     function makeWebCamTexture ( viz ) {
         return W.promise( function ( resolve, reject ) {
-
-            // Web Cam DOM Element
             // -------------------
             var webCamEl = document.createElement('video');
             webCamEl.autoplay = true;
@@ -147,7 +134,7 @@ var PunterViz = (function () {
     function makeCubeCam ( viz ) { 
         return W.promise( function ( resolve, reject ) {
 
-            viz.cubeCamera = new THREE.CubeCamera(1, 3000, 256); // near, far, resolution
+            viz.cubeCamera = new THREE.CubeCamera( 1, 30000, 256 ); // near, far, resolution
             viz.cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter; // mipmap filter
             
             addPreRenderFn( viz, function ( deltaMS, timestampMS ) {    
@@ -211,6 +198,38 @@ var PunterViz = (function () {
         });
     }
 
+    function makeBillboardBackground ( viz ) {
+        return W.promise( function ( resolve, reject ) {
+            var texture =  THREE.ImageUtils.loadTexture( '/image/billboard-background.png' );
+            texture.minFilter = THREE.NearestFilter;
+            texture.magFiler = THREE.NearestFilter;
+            
+            var material = new THREE.MeshBasicMaterial({
+                map: texture,
+                color: 0xffffff,
+                transparent: true
+            });
+
+            var geometry = new THREE.PlaneBufferGeometry( 360, 640 );
+
+            var mesh = new THREE.Mesh( geometry, material );
+
+            mesh.translateZ( -250 );
+
+            viz.scene.add( mesh );
+
+            viz.preCubeCamRenderFns.push( function () {
+                mesh.visible = false;
+            });
+
+            viz.postCubeCamRenderFns.push( function () {
+                mesh.visible = true;
+            });
+            
+            resolve( viz );
+        });
+    }
+
     // Web Cam Hedron Mesh
     // -------------------
     function makeWebCamHedronMesh ( viz ) {
@@ -219,7 +238,7 @@ var PunterViz = (function () {
             // Loader
             // ------
             var loader = new THREE.OBJLoader();
-            loader.load( '/obj/dodecahedron.obj', onObjLoaded );
+            loader.load( '/obj/hedron.obj', onObjLoaded );
 
             // Swarm Creation
             // ----------------
@@ -228,7 +247,7 @@ var PunterViz = (function () {
                 viz.webCamHedronMesh = obj.children[ 0 ].clone(); //new THREE.Mesh( new THREE.BoxGeometry( 2000, 2000, 2000 ), material );
                 viz.webCamHedronMesh.material = viz.webCamMaterial.clone();
                 
-                var scale = 2000;
+                var scale = 6000;
                 viz.webCamHedronMesh.scale.set( scale, scale, scale );
 
                 var rotationX = W.randomBetween( 0.0002, 0.00002 );
@@ -237,9 +256,9 @@ var PunterViz = (function () {
                 
                 // If we want to rotate it
                 addPreRenderFn( viz, function ( deltaMS, timestampMS ) {
-                    viz.webCamHedronMesh.rotation.x += ( deltaMS * rotationX );
-                    viz.webCamHedronMesh.rotation.y += ( deltaMS * rotationY );
-                    viz.webCamHedronMesh.rotation.z += ( deltaMS * rotationZ );
+                    viz.webCamHedronMesh.rotation.x += viz.velocity[ 0 ] * 0.5;
+                    viz.webCamHedronMesh.rotation.y += viz.velocity[ 1 ] * 0.5;
+                    viz.webCamHedronMesh.rotation.z += viz.velocity[ 2 ] * 0.5;
                 });
                 
                 viz.scene.add( viz.webCamHedronMesh );
@@ -247,12 +266,13 @@ var PunterViz = (function () {
                 // Show it only for the cube cam
                 viz.preCubeCamRenderFns.push( function () {
                     viz.webCamHedronMesh.visible = true;
+                    viz.webCamHedronMesh.wireframe = false;
                     viz.webCamHedronMesh.material.color.set( 0xffffff );
                 });
 
                 viz.postCubeCamRenderFns.push( function () {
                     viz.webCamHedronMesh.visible = true;
-                    viz.webCamHedronMesh.material.color.set( 0x6d6841 );
+                    viz.webCamHedronMesh.material.color.set( viz.backgroundColor );
                 });
 
                 resolve( viz );
@@ -305,37 +325,40 @@ var PunterViz = (function () {
             // --------------
             function Particle ( mesh ) {
 
-                // ### Positioning
-                this.positionScalar = W.interpolations.cubicEaseOut( Math.random() );
-               
-                var scale = Particle.initialScale * W.map( this.positionScalar, 0, 1, 0.4, 1 );
+                this.velocity = [ 0, 0, 0 ];
 
                 // Mesh
                 this.mesh = mesh.clone();
                 this.anchor = new THREE.Object3D();
                 this.anchor.add( this.mesh );
                 this.mesh.material = Particle.material.clone();
-                this.mesh.scale.x = scale;
-                this.mesh.scale.y = scale;
-                this.mesh.scale.z = scale;
+                //this.mesh.material.color.offsetHSL( 0.15 - W.randomBetween( -0.1, 0.1 ), 0.3, -0.3 );
+                //this.mesh.material.color.setStyle( 'rgb( 241, 86, 35)' );
+                //this.mesh.material.color.offsetHSL( 0.219444444, 1, -0.5 );
+                this.mesh.material.color = viz.swarmColor;
 
-                var rangeMaxX = 60;
+                var range = 70;
+                this.mesh.translateX( W.randomBetween( -range, range ) );
+                this.mesh.translateY( W.randomBetween( -range, range ) );
+                this.mesh.translateZ( W.randomBetween( -range, range ) );
 
-                this.mesh.position.set( rangeMaxX * (1 - this.positionScalar), W.randomBetween( -50, 50 ), 0 );
-                
-                //this.mesh.position.set( rangeMax * positionScalar, 0, 0 );
+                this.distance = W.map( this.mesh.position.distanceTo( this.anchor.position ), 0, range, 1, 0.1, true );
 
-                this.mesh.rotation.x = W.randomBetween( -180, 180 );
-                this.mesh.rotation.y = W.randomBetween( -180, 180 );
-                this.mesh.rotation.z = W.randomBetween( -180, 180 );
+                var scaleMutiplier = 250;
+                var d = W.interpolations.quarticEaseOut( this.distance );
+                this.mesh.scale.set( d * scaleMutiplier / 2, d * scaleMutiplier / 2, d * scaleMutiplier );
 
-                this.anchor.rotation.y +=  W.randomBetween( -180, 180 );
+                var r = toRad( 180 );
+                this.mesh.rotation.x = W.randomBetween( -r, r );
+                this.mesh.rotation.y = W.randomBetween( -r, r );
+                this.mesh.rotation.z = W.randomBetween( -r, r );
 
-                
-                // var range = 100;
-                // this.mesh.position.set( ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range, ( Math.random() - 0.5 ) * range );
-                
-                
+                var offest = 0.2;
+                this.anchor.rotation.x +=  W.randomBetween( -toRad(20), toRad(20)  );
+
+                this.rotationSpeed = [ Math.random(), Math.random(), Math.random() ].map( Math.abs );
+
+                function toRad ( v ) { return v * 0.0174532925; } 
             }
 
             // ### Static
@@ -348,16 +371,22 @@ var PunterViz = (function () {
                 side: THREE.DoubleSide
             });
 
-            Particle.initialScale = 300;
-
             // ### Method
             Particle.prototype.update = function ( deltaMS, timestampMS ) {
-                this.anchor.rotation.x += viz.velocity[ 0 ] * ( 1 - this.positionScalar ) * 0.4;
-                this.anchor.rotation.y += viz.velocity[ 1 ] * ( 1 - this.positionScalar ) * 0.4;
-                this.anchor.rotation.z += viz.velocity[ 2 ] * ( 1 - this.positionScalar ) * 0.4;
-                this.mesh.rotation.x += 0.002;
-                this.mesh.rotation.y += 0.001;
-                this.mesh.rotation.z += 0.003;
+
+                this.velocity[ 0 ] += ( viz.velocity[ 0 ] - this.velocity[ 0 ] ) * ( 1 - this.distance ) * 0.05;
+                this.velocity[ 1 ] += ( viz.velocity[ 1 ] - this.velocity[ 1 ] ) * ( 1 - this.distance ) * 0.05;
+                this.velocity[ 2 ] += ( viz.velocity[ 2 ] - this.velocity[ 2 ] ) * ( 1 - this.distance ) * 0.05;
+
+                this.anchor.rotation.x += this.velocity[ 0 ] * 0.4;
+                this.anchor.rotation.y += this.velocity[ 1 ] * 0.4;
+                this.anchor.rotation.z += this.velocity[ 2 ] * 0.4;
+
+                var r = Math.max( this.velocity[ 0 ], this.velocity[ 1 ], this.velocity[ 2 ] );
+
+                this.mesh.rotation.x += 0.01 * this.rotationSpeed[ 0 ]; // r * this.rotationSpeed[ 0 ] * 10;
+                this.mesh.rotation.y += 0.01 * this.rotationSpeed[ 1 ] ; //r * this.rotationSpeed[ 1 ] * 10;
+                this.mesh.rotation.z += 0.01 * this.rotationSpeed[ 2 ]; //r * this.rotationSpeed[ 2 ] * 10
             };
 
             // Loader
@@ -374,7 +403,7 @@ var PunterViz = (function () {
                 // Particle Creation
                 // -----------------
                 // Ease in the creation of the particles
-                var maxParticles = 100;
+                var maxParticles = 120;
                 var minCreationTime = 5;
                 var maxCreationTimeMS = 20;
                 
@@ -417,9 +446,7 @@ var PunterViz = (function () {
                 
                 // Render
                 // ------
-                // viz.renderer.clear();
-                //viz.renderer.render( viz.scene, viz.camera );
-                viz.composer.render();
+                viz.renderer.render( viz.scene, viz.camera );
 
             }( lastTimestampMS ));
             
