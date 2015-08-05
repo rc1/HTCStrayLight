@@ -1,9 +1,9 @@
-# Installation on Raspberry pi
+# Installation (Raspberry Pi 2)
 
-In order to get piface-node to install:
+In order to get piface-node module to install:
 
-+ Cloned libpifacedigital, ran make and make install
-+ Cloned libmcp23s17, ran make, then copied mcp23s17.h to /usr/local/include/libmcp23s17/ and copied libmcp23s17.a to usr/local/lib/
++ Cloned `libpifacedigital`, ran `make` and `make install`
++ Cloned `libmcp23s17`, ran `make`, then copied `mcp23s17.h` to `/usr/local/include/libmcp23s17/` and copied `libmcp23s17.a` to `usr/local/lib/`
 
 # Configuation of Cables
 
@@ -24,4 +24,3 @@ Which, translated to Human, means:
 + Relay 6 on the RPi gets cable 2 on the right most relay terminal
 + Relay 7 on the RPi gets cable 3 on the right most relay terminal
 + Relay 3 on the RPi gets cable 4 on the center most relay terminal
-+ 
