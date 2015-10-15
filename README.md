@@ -1,3 +1,5 @@
+![466613194948](https://cloud.githubusercontent.com/assets/166915/10517276/f33101ae-7353-11e5-94ee-dcd83327fb9f.jpeg)
+
 ## Installation (Raspberry Pi 2)
 
 In order to get piface-node module to install:
